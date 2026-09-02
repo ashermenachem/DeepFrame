@@ -1,0 +1,6 @@
+.openai
+dist
+.wrangler
+outputs
+work
+*.tsbuildinfo

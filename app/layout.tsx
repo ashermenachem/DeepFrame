@@ -2,6 +2,14 @@ import type { Metadata } from 'next';
 import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 
+const productionHost = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+const deploymentHost = process.env.VERCEL_URL;
+const siteOrigin = productionHost
+  ? `https://${productionHost}`
+  : deploymentHost
+    ? `https://${deploymentHost}`
+    : 'http://localhost:3000';
+
 const spaceGrotesk = Space_Grotesk({
   variable: '--font-space-grotesk',
   subsets: ['latin'],
@@ -13,7 +21,7 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://photo-data-finder.ashermenachem.chatgpt.site'),
+  metadataBase: new URL(siteOrigin),
   title: 'Photo Data Finder by Asher Menachem',
   description:
     'Every field. Zero uploads. Inspect complete photo metadata privately in your browser.',
