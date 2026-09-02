@@ -2,13 +2,7 @@ import type { Metadata } from 'next';
 import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 
-const productionHost = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-const deploymentHost = process.env.VERCEL_URL;
-const siteOrigin = productionHost
-  ? `https://${productionHost}`
-  : deploymentHost
-    ? `https://${deploymentHost}`
-    : 'http://localhost:3000';
+const siteOrigin = 'https://deepframe.vercel.app';
 
 const spaceGrotesk = Space_Grotesk({
   variable: '--font-space-grotesk',
