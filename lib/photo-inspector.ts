@@ -20,10 +20,15 @@ export type PhotoReport = {
     name: string;
     size: number;
     type: string;
+    extension: string;
+    detectedType: string;
     lastModified: string;
     sha256: string;
     sha1: string;
+    sha384: string;
+    sha512: string;
   };
+  image?: { width: number; height: number; megapixels: number; aspectRatio: string };
   fields: MetadataField[];
   rawMetadata: unknown;
   structure: StructureItem[];
@@ -82,7 +87,9 @@ function serialize(value: unknown, seen = new WeakSet<object>()): unknown {
     seen.delete(value);
     return output;
   }
-  return String(value);
+  if (typeof value === 'symbol') return value.description ?? 'Symbol';
+  if (typeof value === 'function') return value.name || 'Function';
+  return 'Unknown';
 }
 
 function displayValue(tag: unknown): string {
@@ -98,7 +105,11 @@ function displayValue(tag: unknown): string {
   }
   if (tag === null || tag === undefined || tag === '') return '—';
   if (typeof tag === 'object') return JSON.stringify(serialize(tag));
-  return String(tag);
+  if (typeof tag === 'string') return tag;
+  if (typeof tag === 'number' || typeof tag === 'boolean' || typeof tag === 'bigint') return `${tag}`;
+  if (typeof tag === 'symbol') return tag.description ?? 'Symbol';
+  if (typeof tag === 'function') return tag.name || 'Function';
+  return 'Unknown';
 }
 
 function flattenGroup(groupKey: string, value: unknown): MetadataField[] {
@@ -144,13 +155,53 @@ function hex(bytes: Uint8Array, limit = 256) {
     .toUpperCase();
 }
 
-async function digest(name: 'SHA-256' | 'SHA-1', buffer: ArrayBuffer) {
+async function digest(name: 'SHA-1' | 'SHA-256' | 'SHA-384' | 'SHA-512', buffer: ArrayBuffer) {
   const output = await crypto.subtle.digest(name, buffer);
   return Array.from(new Uint8Array(output), (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
 function readAscii(bytes: Uint8Array, start: number, length: number) {
   return String.fromCharCode(...bytes.subarray(start, start + length));
+}
+
+function detectFileType(bytes: Uint8Array) {
+  if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'JPEG';
+  if (bytes[0] === 0x89 && readAscii(bytes, 1, 3) === 'PNG') return 'PNG';
+  if (readAscii(bytes, 0, 6) === 'GIF87a' || readAscii(bytes, 0, 6) === 'GIF89a') return 'GIF';
+  if (readAscii(bytes, 0, 4) === 'RIFF' && readAscii(bytes, 8, 4) === 'WEBP') return 'WebP';
+  if ((readAscii(bytes, 0, 2) === 'II' && bytes[2] === 0x2a) || (readAscii(bytes, 0, 2) === 'MM' && bytes[3] === 0x2a)) return 'TIFF';
+  if (readAscii(bytes, 0, 2) === 'BM') return 'BMP';
+  if (readAscii(bytes, 4, 4) === 'ftyp') {
+    const brand = readAscii(bytes, 8, 4).toLowerCase();
+    if (brand.includes('avif') || brand.includes('avis')) return 'AVIF';
+    if (['heic', 'heix', 'hevc', 'hevx', 'mif1', 'msf1'].includes(brand)) return 'HEIC / HEIF';
+    return `ISO Base Media (${brand || 'unknown brand'})`;
+  }
+  return 'Unknown signature';
+}
+
+async function decodedDimensions(file: File) {
+  if (typeof createImageBitmap !== 'function') return undefined;
+  try {
+    const bitmap = await createImageBitmap(file);
+    const { width, height } = bitmap;
+    bitmap.close();
+    if (!width || !height) return undefined;
+    const divisor = (a: number, b: number): number => b === 0 ? a : divisor(b, a % b);
+    const common = divisor(width, height);
+    return {
+      width,
+      height,
+      megapixels: Number(((width * height) / 1_000_000).toFixed(2)),
+      aspectRatio: `${width / common}:${height / common}`,
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+function systemField(name: string, display: string, raw: unknown): MetadataField {
+  return { group: 'File properties', name, path: `fileSystem.${name.replaceAll(' ', '')}`, display, raw };
 }
 
 const JPEG_MARKERS: Record<number, string> = {
@@ -258,14 +309,48 @@ export async function inspectPhoto(file: File): Promise<PhotoReport> {
   const bytes = new Uint8Array(buffer);
   let metadata: Record<string, unknown> = {};
   try {
-    metadata = (await ExifReader.load(buffer, { expanded: true, includeOffsets: true })) as unknown as Record<string, unknown>;
+    metadata = ExifReader.load(buffer, {
+      expanded: true,
+      includeOffsets: true,
+      includeUnknown: true,
+      computed: true,
+    }) as unknown as Record<string, unknown>;
   } catch {
     metadata = {};
   }
 
-  const fields = Object.entries(metadata)
-    .flatMap(([group, value]) => flattenGroup(group, value))
-    .sort((a, b) => a.group.localeCompare(b.group) || a.name.localeCompare(b.name));
+  const detectedType = detectFileType(bytes);
+  const extension = file.name.includes('.') ? file.name.split('.').pop()?.toLowerCase() ?? '' : '';
+  const image = await decodedDimensions(file);
+  const [sha1, sha256, sha384, sha512] = await Promise.all([
+    digest('SHA-1', buffer.slice(0)),
+    digest('SHA-256', buffer.slice(0)),
+    digest('SHA-384', buffer.slice(0)),
+    digest('SHA-512', buffer.slice(0)),
+  ]);
+  const systemFields: MetadataField[] = [
+    systemField('File name', file.name, file.name),
+    systemField('File size', `${formatBytes(file.size)} (${file.size.toLocaleString('en-US')} bytes)`, file.size),
+    systemField('File extension', extension ? `.${extension}` : 'None', extension),
+    systemField('Declared MIME type', file.type || 'Not supplied', file.type || null),
+    systemField('Detected format', detectedType, detectedType),
+    systemField('Last modified', new Date(file.lastModified).toISOString(), file.lastModified),
+    systemField('Magic bytes', hex(bytes, 16), Array.from(bytes.subarray(0, 16))),
+    systemField('SHA-1', sha1, sha1),
+    systemField('SHA-256', sha256, sha256),
+    systemField('SHA-384', sha384, sha384),
+    systemField('SHA-512', sha512, sha512),
+    ...(image ? [
+      systemField('Decoded width', `${image.width.toLocaleString('en-US')} px`, image.width),
+      systemField('Decoded height', `${image.height.toLocaleString('en-US')} px`, image.height),
+      systemField('Pixel count', `${image.megapixels} MP`, image.width * image.height),
+      systemField('Aspect ratio', image.aspectRatio, image.aspectRatio),
+    ] : []),
+  ];
+  const fields = [
+    ...systemFields,
+    ...Object.entries(metadata).flatMap(([group, value]) => flattenGroup(group, value)),
+  ].sort((a, b) => a.group.localeCompare(b.group) || a.name.localeCompare(b.name));
   const latitude = numericField(fields, /gps\.Latitude$/i);
   const longitude = numericField(fields, /gps\.Longitude$/i);
   const altitudeField = fields.find((item) => /gps\.GPSAltitude$|gps\.Altitude$/i.test(item.path));
@@ -276,10 +361,15 @@ export async function inspectPhoto(file: File): Promise<PhotoReport> {
       name: file.name,
       size: file.size,
       type: file.type || 'Unknown',
+      extension,
+      detectedType,
       lastModified: new Date(file.lastModified).toISOString(),
-      sha256: await digest('SHA-256', buffer.slice(0)),
-      sha1: await digest('SHA-1', buffer.slice(0)),
+      sha256,
+      sha1,
+      sha384,
+      sha512,
     },
+    image,
     fields,
     rawMetadata: serialize(metadata),
     structure: inspectStructure(bytes),

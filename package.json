@@ -23,6 +23,7 @@
     "exifreader": "^4.44.0",
     "input-otp": "1.4.2",
     "lucide-react": "1.31.0",
+    "motion": "^13.2.0",
     "react": "19.2.6",
     "react-day-picker": "9.8.1",
     "react-dom": "19.2.6",

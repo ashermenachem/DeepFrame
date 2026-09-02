@@ -1,35 +1,35 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const spaceGrotesk = Space_Grotesk({
+  variable: '--font-space-grotesk',
   subsets: ['latin'],
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const jetBrainsMono = JetBrains_Mono({
+  variable: '--font-jetbrains-mono',
   subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://photo-data-finder.ashermenachem.chatgpt.site'),
-  title: 'Photo Data Finder — See what your photo knows',
+  title: 'Photo Data Finder by Asher Menachem',
   description:
-    'Inspect every metadata field embedded in a photo, privately in your browser.',
+    'Every field. Zero uploads. Inspect complete photo metadata privately in your browser.',
   icons: { icon: '/favicon.svg' },
   openGraph: {
     title: 'Photo Data Finder',
-    description: 'See what your photo knows. Inspect every embedded metadata field privately in your browser.',
+    description: 'Every field. Zero uploads. A private photo metadata inspector by Asher Menachem.',
     url: '/',
     siteName: 'Photo Data Finder',
     type: 'website',
-    images: [{ url: '/og.png', width: 1731, height: 909, alt: 'Photo Data Finder — See what your photo knows.' }],
+    images: [{ url: '/og.png', width: 1731, height: 909, alt: 'Photo Data Finder — Every field. Zero uploads. By Asher Menachem.' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Photo Data Finder',
-    description: 'See what your photo knows. Inspect every embedded metadata field privately in your browser.',
+    description: 'Every field. Zero uploads. A private photo metadata inspector by Asher Menachem.',
     images: ['/og.png'],
   },
 };
@@ -42,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${spaceGrotesk.variable} ${jetBrainsMono.variable} antialiased`}
       >
         {children}
       </body>
