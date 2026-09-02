@@ -128,7 +128,7 @@ function AppHeader({ onNew }: { onNew?: (file: File) => void }) {
             <ScanSearch className="size-4 text-emerald-400" />
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold tracking-[-0.025em]">Photo Data Finder</p>
+            <p className="truncate text-sm font-semibold tracking-[-0.025em]">DeepFrame</p>
             <p className="font-mono text-[8px] uppercase tracking-[0.18em] text-emerald-400/45">by Asher Menachem</p>
           </div>
         </div>
@@ -312,7 +312,7 @@ function ShareView({ report, copiedId, onCopy }: { report: PhotoReport; copiedId
   const stem = report.file.name.replace(/\.[^.]+$/, '') || 'photo';
   const nativeShare = async () => {
     try {
-      if (navigator.share) await navigator.share({ title: `Photo metadata — ${report.file.name}`, text });
+      if (navigator.share) await navigator.share({ title: `DeepFrame report — ${report.file.name}`, text });
       else onCopy(text, 'share');
     } catch { /* The user cancelled the native share sheet. */ }
   };
@@ -337,12 +337,12 @@ function Results({ report, previewUrl, view, setView, search, setSearch, group, 
           <div className="p-4 sm:p-6"><AnimatePresence mode="wait"><motion.div key={view} initial={reduceMotion ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={reduceMotion ? undefined : { opacity: 0, y: -5 }} transition={{ duration: 0.2 }}>{view === 'overview' && <Overview report={report} copiedId={copiedId} onCopy={onCopy} />}{view === 'metadata' && <MetadataView report={report} search={search} setSearch={setSearch} group={group} setGroup={setGroup} copiedId={copiedId} onCopy={onCopy} />}{view === 'structure' && <StructureView report={report} />}{view === 'share' && <ShareView report={report} copiedId={copiedId} onCopy={onCopy} />}{view === 'raw' && <section className="overflow-hidden border border-emerald-400/10 bg-[#080c09]"><div className="flex items-center justify-between border-b border-emerald-400/10 bg-[#0c120e] px-4 py-3"><div><h2 className="text-xs font-semibold">Lossless decoded report</h2><p className="mt-1 text-[9px] text-muted-foreground">Raw tag values and binary metadata are preserved here.</p></div><CopyButton done={copiedId === 'raw'} onClick={() => onCopy(JSON.stringify(report, null, 2), 'raw')} /></div><pre className="max-h-[760px] overflow-auto p-5 font-mono text-[9px] leading-5 text-emerald-50/50">{JSON.stringify(report, null, 2)}</pre></section>}</motion.div></AnimatePresence></div>
         </main>
       </div>
-      <div className="mt-4 flex flex-col gap-3 border-t border-emerald-400/10 pt-4 sm:flex-row sm:items-center sm:justify-between"><p className="font-mono text-[8px] text-emerald-100/25">PHOTO DATA FINDER BY <span className="text-emerald-400/60">ASHER MENACHEM</span></p><SocialLinks /></div>
+      <div className="mt-4 flex flex-col gap-3 border-t border-emerald-400/10 pt-4 sm:flex-row sm:items-center sm:justify-between"><p className="font-mono text-[8px] text-emerald-100/25">DEEPFRAME BY <span className="text-emerald-400/60">ASHER MENACHEM</span></p><SocialLinks /></div>
     </div>
   );
 }
 
-export default function PhotoDataFinder() {
+export default function DeepFrame() {
   const [report, setReport] = useState<PhotoReport | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -360,7 +360,7 @@ export default function PhotoDataFinder() {
     if (!context?.registerTool) return;
     const lifecycle = new AbortController();
     try {
-      void Promise.resolve(context.registerTool({ name: 'read_current_photo_summary', title: 'Read current photo summary', description: 'Read a concise summary of the photo currently inspected in Photo Data Finder.', inputSchema: { type: 'object', properties: {}, additionalProperties: false }, annotations: { readOnlyHint: true, untrustedContentHint: true }, execute: () => { const current = reportRef.current; if (!current) throw new Error('No photo has been inspected yet.'); return { file: current.file, metadataFieldCount: current.fields.length, groups: Array.from(new Set(current.fields.map((item) => item.group))), gps: current.gps ?? null, device: [pick(current, [/exif\.Make$/i]), pick(current, [/exif\.Model$/i])].filter(Boolean).join(' ') || null, lens: pick(current, [/LensModel$/i, /LensID$/i]) ?? null }; } }, { signal: lifecycle.signal })).catch(() => undefined);
+      void Promise.resolve(context.registerTool({ name: 'read_current_photo_summary', title: 'Read current photo summary', description: 'Read a concise summary of the photo currently inspected in DeepFrame.', inputSchema: { type: 'object', properties: {}, additionalProperties: false }, annotations: { readOnlyHint: true, untrustedContentHint: true }, execute: () => { const current = reportRef.current; if (!current) throw new Error('No photo has been inspected yet.'); return { file: current.file, metadataFieldCount: current.fields.length, groups: Array.from(new Set(current.fields.map((item) => item.group))), gps: current.gps ?? null, device: [pick(current, [/exif\.Make$/i]), pick(current, [/exif\.Model$/i])].filter(Boolean).join(' ') || null, lens: pick(current, [/LensModel$/i, /LensID$/i]) ?? null }; } }, { signal: lifecycle.signal })).catch(() => undefined);
     } catch { /* Experimental API unavailable. */ }
     return () => lifecycle.abort();
   }, []);

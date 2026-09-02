@@ -22,22 +22,22 @@ const jetBrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteOrigin),
-  title: 'Photo Data Finder by Asher Menachem',
+  title: 'DeepFrame by Asher Menachem',
   description:
-    'Every field. Zero uploads. Inspect complete photo metadata privately in your browser.',
+    'DeepFrame reveals complete photo metadata privately in your browser—every field, with zero uploads.',
   icons: { icon: '/favicon.svg' },
   openGraph: {
-    title: 'Photo Data Finder',
-    description: 'Every field. Zero uploads. A private photo metadata inspector by Asher Menachem.',
+    title: 'DeepFrame',
+    description: 'DeepFrame is a private photo metadata inspector by Asher Menachem. Every field. Zero uploads.',
     url: '/',
-    siteName: 'Photo Data Finder',
+    siteName: 'DeepFrame',
     type: 'website',
-    images: [{ url: '/og.png', width: 1731, height: 909, alt: 'Photo Data Finder — Every field. Zero uploads. By Asher Menachem.' }],
+    images: [{ url: '/og.png', width: 1731, height: 909, alt: 'DeepFrame — Every field. Zero uploads. By Asher Menachem.' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Photo Data Finder',
-    description: 'Every field. Zero uploads. A private photo metadata inspector by Asher Menachem.',
+    title: 'DeepFrame',
+    description: 'DeepFrame is a private photo metadata inspector by Asher Menachem. Every field. Zero uploads.',
     images: ['/og.png'],
   },
 };

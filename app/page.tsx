@@ -1,5 +1,5 @@
-import PhotoDataFinder from '@/components/photo-data-finder';
+import DeepFrame from '@/components/photo-data-finder';
 
 export default function Home() {
-  return <PhotoDataFinder />;
+  return <DeepFrame />;
 }

@@ -35,13 +35,13 @@ export function IntroSequence() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (window.sessionStorage.getItem('pdf-intro-seen')) {
+    if (window.sessionStorage.getItem('deepframe-intro-seen')) {
       return;
     }
     const frame = window.requestAnimationFrame(() => setVisible(true));
     const close = () => {
       setVisible(false);
-      window.sessionStorage.setItem('pdf-intro-seen', 'true');
+      window.sessionStorage.setItem('deepframe-intro-seen', 'true');
     };
     const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') close(); };
     window.addEventListener('keydown', onKey);
@@ -55,7 +55,7 @@ export function IntroSequence() {
 
   const close = () => {
     setVisible(false);
-    window.sessionStorage.setItem('pdf-intro-seen', 'true');
+    window.sessionStorage.setItem('deepframe-intro-seen', 'true');
   };
 
   const line = {
@@ -83,7 +83,7 @@ export function IntroSequence() {
               <span className="size-2.5 rounded-full bg-[#ff5f57]" />
               <span className="size-2.5 rounded-full bg-[#febc2e]" />
               <span className="size-2.5 rounded-full bg-[#28c840]" />
-              <span className="ml-2 font-mono text-[9px] text-emerald-200/40">photo-data-finder — secure session</span>
+              <span className="ml-2 font-mono text-[9px] text-emerald-200/40">deepframe — secure session</span>
             </div>
             <div className="px-6 py-10 sm:px-12 sm:py-14">
               <motion.div
@@ -95,7 +95,7 @@ export function IntroSequence() {
                   $ initializing local forensic workspace_
                 </motion.p>
                 <motion.h1 variants={line} className="mt-5 text-4xl font-semibold tracking-[-0.055em] text-white sm:text-6xl">
-                  Photo Data Finder
+                  DeepFrame
                 </motion.h1>
                 <motion.p variants={line} className="mt-3 font-mono text-sm text-emerald-300">
                   by Asher Menachem<span className="ml-1 animate-pulse">▌</span>
