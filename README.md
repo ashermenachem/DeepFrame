@@ -11,6 +11,7 @@
   </a>
   <img src="https://img.shields.io/badge/PRIVACY-100%25_LOCAL-7C3AED?style=for-the-badge&logo=shield&logoColor=white" alt="100% local processing" />
   <img src="https://img.shields.io/badge/UPLOADS-ZERO-111827?style=for-the-badge&logo=icloud&logoColor=white" alt="Zero uploads" />
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/LICENSE-PERMISSION_REQUIRED-F59E0B?style=for-the-badge&logo=readthedocs&logoColor=111827" alt="Source-available license — permission required" /></a>
 
   <h3>See what your photo knows.</h3>
 
@@ -82,6 +83,12 @@ flowchart LR
 - No cloud copy of your image
 - No server-side photo processing
 - Analysis disappears when the browser session ends
+
+## Responsible use
+
+DeepFrame can surface exact locations and other sensitive details. It is built for legitimate inspection—not stalking, doxxing, covert tracking, harassment, or unauthorized surveillance.
+
+The inspection workspace requires explicit acceptance of the [DeepFrame Terms of Service](https://deepframesearch.vercel.app/terms). Declining keeps the tool locked. Read the repository copy in [TERMS.md](./TERMS.md).
 
 ## Supported image families
 
@@ -161,7 +168,15 @@ Other pushed branches receive isolated preview deployments.
 
 ## Contributing
 
-Thoughtful bug reports and ideas are welcome. Read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening an issue or pull request. For security concerns, follow [SECURITY.md](./SECURITY.md) instead of posting publicly.
+Thoughtful bug reports and ideas are welcome. Read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening an issue or pull request. For security concerns, follow [SECURITY.md](./SECURITY.md) instead of posting publicly. Use of the source is subject to the license below.
+
+## License
+
+DeepFrame is **source-available**, not OSI-approved open source. You may view and study the code, but you must receive prior written permission from Asher Menachem before copying, modifying, distributing, hosting, deploying, incorporating, or otherwise using it.
+
+When permission is granted, products using DeepFrame code must give clear, reasonably prominent credit to **DeepFrame by Asher Menachem** with a link to this repository. Credit hidden only in source files, obscure documentation, legal boilerplate, or unusually small footer text is not sufficient.
+
+Read the complete [DeepFrame Source-Available License 1.0](./LICENSE).
 
 ## Creator
 

@@ -27,8 +27,8 @@ export const socials = [
   {
     label: 'GitHub',
     short: 'GH',
-    handle: '@ashermenachem',
-    href: 'https://github.com/ashermenachem',
+    handle: 'DeepFrame source',
+    href: 'https://github.com/ashermenachem/DeepFrame',
   },
   {
     label: 'X',
@@ -66,18 +66,29 @@ export function SocialLinks({ detailed = false }: { detailed?: boolean }) {
   );
 }
 
-export function IntroSequence() {
+export function IntroSequence({ onComplete }: { onComplete?: () => void }) {
   const reduceMotion = useReducedMotion();
   const [visible, setVisible] = useState(false);
   const skipRef = useRef<HTMLButtonElement>(null);
+  const completedRef = useRef(false);
+
+  const complete = useCallback(() => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    onComplete?.();
+  }, [onComplete]);
 
   const close = useCallback(() => {
     setVisible(false);
     window.sessionStorage.setItem(introKey, 'true');
-  }, []);
+    complete();
+  }, [complete]);
 
   useEffect(() => {
-    if (window.sessionStorage.getItem(introKey)) return;
+    if (window.sessionStorage.getItem(introKey)) {
+      complete();
+      return;
+    }
 
     const frame = window.requestAnimationFrame(() => setVisible(true));
     const timer = window.setTimeout(close, reduceMotion ? 1200 : 5000);
@@ -86,7 +97,7 @@ export function IntroSequence() {
       window.cancelAnimationFrame(frame);
       window.clearTimeout(timer);
     };
-  }, [close, reduceMotion]);
+  }, [close, complete, reduceMotion]);
 
   useEffect(() => {
     if (!visible) return;

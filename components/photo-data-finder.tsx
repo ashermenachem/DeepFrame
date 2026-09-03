@@ -4,11 +4,13 @@ import {
   ChangeEvent,
   DragEvent,
   type ReactNode,
+  useCallback,
   useEffect,
   useRef,
   useState,
 } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import {
   AnimatePresence,
   motion,
@@ -38,6 +40,7 @@ import {
   Fingerprint,
   FolderSearch2,
   Gauge,
+  GitBranch,
   ImageIcon,
   Info,
   Layers3,
@@ -45,6 +48,7 @@ import {
   MapPin,
   Maximize2,
   Radio,
+  Scale,
   ScanSearch,
   Search,
   Share2,
@@ -61,6 +65,7 @@ import { Switch } from '@/components/ui/switch';
 import { IntroSequence, SocialLinks } from '@/components/intro-sequence';
 import { AnalysisLoader } from '@/components/analysis-loader';
 import { DeepFrameVisual } from '@/components/deepframe-visual';
+import { TermsGate } from '@/components/terms-gate';
 import {
   findField,
   formatBytes,
@@ -69,6 +74,7 @@ import {
   type PhotoReport,
 } from '@/lib/photo-inspector';
 import { buildShareText } from '@/lib/share-report';
+import { termsStorageKey, termsVersion } from '@/lib/legal';
 
 type View = 'overview' | 'metadata' | 'structure' | 'share' | 'raw';
 
@@ -95,6 +101,8 @@ const navItems = [
   { id: 'share', label: 'Share', icon: Share2 },
   { id: 'raw', label: 'Raw data', icon: Code2 },
 ] as const;
+
+const repositoryUrl = 'https://github.com/ashermenachem/DeepFrame';
 
 const emptySignals = [
   {
@@ -353,6 +361,22 @@ function AppHeader({
             <span className="size-1.5 rounded-full bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,.9)]" />
             On-device
           </div>
+          <Link
+            href="/terms"
+            aria-label="Read the DeepFrame Terms of Service"
+            className="grid size-8 place-items-center rounded-full border border-white/[0.075] bg-white/[0.025] text-white/38 transition hover:-translate-y-0.5 hover:border-violet-100/20 hover:bg-violet-100/[0.055] hover:text-violet-100"
+          >
+            <Scale className="size-3.5" />
+          </Link>
+          <a
+            href={repositoryUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open the DeepFrame GitHub repository"
+            className="grid size-8 place-items-center rounded-full border border-white/[0.075] bg-white/[0.025] text-white/38 transition hover:-translate-y-0.5 hover:border-cyan-100/20 hover:bg-cyan-100/[0.055] hover:text-cyan-100"
+          >
+            <GitBranch className="size-3.5" />
+          </a>
           {onNew && !busy && <UploadButton onFile={onNew} />}
         </div>
       </div>
@@ -933,9 +957,41 @@ function Landing({
               Every field · Zero uploads
             </p>
           </div>
-          <SocialLinks />
+          <div className="flex flex-col gap-3 sm:items-end">
+            <ProjectLinks />
+            <SocialLinks />
+          </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function ProjectLinks() {
+  return (
+    <div className="flex flex-wrap items-center gap-3 font-mono text-[7px] uppercase tracking-[0.14em] text-white/28">
+      <Link
+        href="/terms"
+        className="inline-flex items-center gap-1.5 transition hover:text-violet-100/75"
+      >
+        <Scale className="size-3" /> Terms
+      </Link>
+      <a
+        href={repositoryUrl}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex items-center gap-1.5 transition hover:text-cyan-100/75"
+      >
+        <GitBranch className="size-3" /> Source on GitHub
+      </a>
+      <a
+        href={`${repositoryUrl}/blob/main/LICENSE`}
+        target="_blank"
+        rel="noreferrer"
+        className="transition hover:text-amber-100/75"
+      >
+        License
+      </a>
     </div>
   );
 }
@@ -1732,13 +1788,16 @@ function Results({
         <p className="font-mono text-[7px] uppercase tracking-[0.14em] text-white/22">
           DEEPFRAME BY <span className="text-cyan-100/52">ASHER MENACHEM</span>
         </p>
-        <SocialLinks />
+        <div className="flex flex-col gap-3 sm:items-end">
+          <ProjectLinks />
+          <SocialLinks />
+        </div>
       </div>
     </motion.div>
   );
 }
 
-export default function DeepFrame() {
+function DeepFrameWorkspace() {
   const [report, setReport] = useState<PhotoReport | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -1845,7 +1904,6 @@ export default function DeepFrame() {
 
   return (
     <>
-      <IntroSequence />
       <AppHeader onNew={report ? handleFile : undefined} busy={loading} />
       {report && loading ? (
         <motion.main
@@ -1874,6 +1932,54 @@ export default function DeepFrame() {
           loading={loading}
           error={error}
           fileName={loadingFileName}
+        />
+      )}
+    </>
+  );
+}
+
+type TermsState = 'checking' | 'pending' | 'accepted' | 'declined';
+
+export default function DeepFrame() {
+  const [introComplete, setIntroComplete] = useState(false);
+  const [termsState, setTermsState] = useState<TermsState>('checking');
+
+  const handleIntroComplete = useCallback(() => setIntroComplete(true), []);
+
+  useEffect(() => {
+    const accepted =
+      window.localStorage.getItem(termsStorageKey) === termsVersion;
+    // oxlint-disable-next-line react/react-compiler -- Hydrate the persisted clickwrap decision after the client mounts.
+    setTermsState(accepted ? 'accepted' : 'pending');
+  }, []);
+
+  const acceptTerms = () => {
+    window.localStorage.setItem(termsStorageKey, termsVersion);
+    setTermsState('accepted');
+  };
+
+  const declineTerms = () => {
+    window.localStorage.removeItem(termsStorageKey);
+    setTermsState('declined');
+  };
+
+  return (
+    <>
+      <IntroSequence onComplete={handleIntroComplete} />
+      {!introComplete ? (
+        <div aria-hidden="true" className="min-h-[100svh] bg-[#03040a]" />
+      ) : termsState === 'accepted' ? (
+        <DeepFrameWorkspace />
+      ) : termsState === 'checking' ? (
+        <main className="grid min-h-[100svh] place-items-center bg-[#03040a]">
+          <div className="size-6 animate-spin rounded-full border border-cyan-100/15 border-t-cyan-100/75" />
+        </main>
+      ) : (
+        <TermsGate
+          declined={termsState === 'declined'}
+          onAccept={acceptTerms}
+          onDecline={declineTerms}
+          onReview={() => setTermsState('pending')}
         />
       )}
     </>

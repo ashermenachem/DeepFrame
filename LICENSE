@@ -1,0 +1,97 @@
+DeepFrame Source-Available License 1.0
+
+Copyright (c) 2026 Asher Menachem. All rights reserved.
+
+This is a source-available license, not an Open Source Initiative-approved
+open-source license.
+
+1. DEFINITIONS
+
+"Software" means the DeepFrame source code, documentation, visual design,
+branding, assets, and other materials distributed with this license.
+
+"Use" includes copying, modifying, adapting, translating, distributing,
+publishing, sublicensing, selling, hosting, deploying, incorporating into
+another product or service, or creating a derivative work from the Software.
+
+2. PERMISSION TO VIEW
+
+You may view, study, and evaluate the publicly available source code for
+personal and educational inspection. Access to the source code does not, by
+itself, grant permission to Use the Software.
+
+3. PRIOR WRITTEN PERMISSION REQUIRED
+
+Before you Use any part of the Software beyond the limited permission to view,
+study, and evaluate it, you must obtain prior written permission from Asher
+Menachem. Permission may be requested through the repository owner's public
+contact methods at https://github.com/ashermenachem.
+
+Any permission may include additional conditions. A permission applies only to
+the person or organization, project, purpose, and version described in that
+permission. It may not be transferred or sublicensed unless the written
+permission expressly allows it.
+
+4. PROMINENT ATTRIBUTION REQUIRED
+
+If permission is granted, every permitted product, service, website,
+application, publication, or other work that uses the Software must give clear
+and reasonably prominent credit to Asher Menachem and DeepFrame.
+
+The credit must:
+
+  a. use wording substantially similar to "Includes technology from DeepFrame
+     by Asher Menachem";
+  b. include a working link to https://github.com/ashermenachem/DeepFrame when
+     the medium supports links; and
+  c. appear in a location and at a size that an ordinary user is reasonably
+     likely to notice, such as an About screen, credits screen, onboarding
+     sequence, primary settings screen, or adjacent to the feature that uses
+     the Software.
+
+Credit located only in source files, hidden documentation, legal boilerplate,
+an obscure page, or unusually small or low-contrast footer text does not satisfy
+this requirement.
+
+You may not remove or obscure existing copyright, attribution, license, or
+branding notices in the Software.
+
+5. NO ENDORSEMENT
+
+You may not state or imply that Asher Menachem endorses, sponsors, certifies, or
+is affiliated with your product or organization without separate written
+permission.
+
+6. RESPONSIBLE-USE CONDITION
+
+The Software may not be used to stalk, harass, threaten, dox, covertly track,
+identify, locate, surveil, or profile a person without lawful authority and
+appropriate consent. It may not be used to facilitate abuse, discrimination,
+privacy invasion, or any unlawful act.
+
+7. TERMINATION
+
+Any permission under this license terminates automatically if you violate its
+terms. Upon termination, you must stop using and distributing the Software and,
+to the extent reasonably possible, remove it from products and services under
+your control. Sections that by their nature should survive termination remain
+in effect.
+
+8. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT,
+ACCURACY, OR RELIABILITY.
+
+9. LIMITATION OF LIABILITY
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, ASHER MENACHEM WILL NOT BE LIABLE FOR
+ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE
+DAMAGES, OR FOR ANY LOSS OF DATA, PRIVACY, PROFITS, REVENUE, OR GOODWILL,
+ARISING FROM OR RELATED TO THE SOFTWARE OR ITS USE.
+
+10. NO IMPLIED RIGHTS
+
+No rights are granted except those expressly stated in this license. All rights
+not expressly granted are reserved by Asher Menachem.
