@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 
-const siteOrigin = 'https://deepframe-photo.vercel.app';
+const siteOrigin = 'https://deepframesearch.vercel.app';
 
 const spaceGrotesk = Space_Grotesk({
   variable: '--font-space-grotesk',
