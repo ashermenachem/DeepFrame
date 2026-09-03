@@ -95,6 +95,7 @@ function Carousel({
 
   React.useEffect(() => {
     if (!api) return;
+    // oxlint-disable-next-line react/react-compiler -- Initialize state from the external carousel API before subscribing.
     onSelect(api);
     api.on('reInit', onSelect);
     api.on('select', onSelect);

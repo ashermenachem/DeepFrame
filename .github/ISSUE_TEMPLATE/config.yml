@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Open DeepFrame
+    url: https://deepframesearch.vercel.app
+    about: Try the current production version before filing an issue.
+  - name: Security report
+    url: https://github.com/ashermenachem
+    about: Contact the repository owner privately for security concerns.

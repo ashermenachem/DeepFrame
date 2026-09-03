@@ -1,0 +1,53 @@
+name: Bug report
+description: Report a reproducible problem in DeepFrame
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve DeepFrame. Do not upload a private photo or expose personal metadata in this report.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Explain what you expected and what happened instead.
+      placeholder: DeepFrame showed…
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open DeepFrame
+        2. Select a sanitized test image
+        3. Open…
+    validations:
+      required: true
+  - type: input
+    id: format
+    attributes:
+      label: Image format
+      description: Format only—do not attach the original private image.
+      placeholder: JPEG, HEIC, PNG, WebP…
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and operating system
+      placeholder: Safari 26 on macOS 26
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add sanitized screenshots, console errors, or other useful details.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I removed private photos, GPS coordinates, credentials, and personal metadata from this report.
+          required: true

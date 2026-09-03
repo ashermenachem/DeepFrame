@@ -32,6 +32,7 @@
     "next-env.d.ts"
   ],
   "rules": {
+    "jsx-a11y/prefer-tag-over-role": "off",
     "no-array-constructor": "error",
     "no-var": "error",
     "prefer-const": "error",
