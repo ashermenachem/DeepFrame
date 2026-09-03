@@ -1,11 +1,11 @@
-import type { Metadata } from 'next';
-import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
 const siteOrigin = 'https://deepframesearch.vercel.app';
 
-const spaceGrotesk = Space_Grotesk({
-  variable: '--font-space-grotesk',
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin'],
 });
 
@@ -22,18 +22,32 @@ export const metadata: Metadata = {
   icons: { icon: '/favicon.svg' },
   openGraph: {
     title: 'DeepFrame',
-    description: 'DeepFrame is a private photo metadata inspector by Asher Menachem. Every field. Zero uploads.',
+    description:
+      'DeepFrame is a private photo metadata inspector by Asher Menachem. Every field. Zero uploads.',
     url: '/',
     siteName: 'DeepFrame',
     type: 'website',
-    images: [{ url: '/og.png', width: 1731, height: 909, alt: 'DeepFrame — Every field. Zero uploads. By Asher Menachem.' }],
+    images: [
+      {
+        url: '/og-v2.png',
+        width: 1734,
+        height: 907,
+        alt: 'DeepFrame — Every field. Zero uploads. By Asher Menachem.',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'DeepFrame',
-    description: 'DeepFrame is a private photo metadata inspector by Asher Menachem. Every field. Zero uploads.',
-    images: ['/og.png'],
+    description:
+      'DeepFrame is a private photo metadata inspector by Asher Menachem. Every field. Zero uploads.',
+    images: ['/og-v2.png'],
   },
+};
+
+export const viewport: Viewport = {
+  colorScheme: 'dark',
+  themeColor: '#05060a',
 };
 
 export default function RootLayout({
@@ -42,12 +56,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${spaceGrotesk.variable} ${jetBrainsMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="en" className={`${inter.variable} ${jetBrainsMono.variable}`}>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }
