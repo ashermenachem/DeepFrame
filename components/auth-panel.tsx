@@ -61,7 +61,17 @@ export function AuthPanel({ onClose }: { onClose?: () => void }) {
       );
       setCooldown(60);
     } catch (reason) {
-      setMessage(reason instanceof Error ? reason.message : 'Sign-in failed.');
+      const nextMessage =
+        reason instanceof Error ? reason.message : 'Sign-in failed.';
+      setMessage(nextMessage);
+      if (nextMessage.includes('temporarily busy')) {
+        const cooldownUntil = Date.now() + 60_000;
+        window.localStorage.setItem(
+          'deepframe-email-cooldown',
+          String(cooldownUntil),
+        );
+        setCooldown(60);
+      }
     } finally {
       setBusy(false);
     }
