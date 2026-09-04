@@ -126,6 +126,7 @@ export function AuthPanel({ onClose }: { onClose?: () => void }) {
           className="h-11 border-white/10 bg-black/20"
         />
         <Button
+          type="submit"
           disabled={busy}
           className="h-11 w-full rounded-xl bg-white font-semibold text-[#070810] hover:bg-cyan-50"
         >
