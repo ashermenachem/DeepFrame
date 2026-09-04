@@ -1,15 +1,26 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
+  Activity,
   ArrowLeft,
+  Ban,
   CalendarClock,
   Eye,
+  FileJson,
   FileImage,
+  RotateCcw,
+  Save,
   ShieldCheck,
+  UserCog,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { DeepFrameLogo } from '@/components/deepframe-logo';
+import { AdminAssetActions } from '@/components/admin-asset-actions';
+import { createClient } from '@/lib/supabase/client';
 import { formatBytes } from '@/lib/photo-inspector';
 import type { AccountProfile } from '@/lib/account';
 
@@ -22,12 +33,18 @@ type Inspection = {
   metadata_field_count: number;
   sha256: string | null;
   created_at: string;
+  completed_at: string | null;
   privacy_cleaned_at: string | null;
+  storage_path: string | null;
+  cleaned_storage_path: string | null;
+  report: unknown;
+  failure_reason: string | null;
+  hidden_from_history_at: string | null;
 };
 type Event = {
   id: number;
   event_type: string;
-  event_data: unknown;
+  event_data: Record<string, unknown>;
   created_at: string;
 };
 type Usage = {
@@ -41,12 +58,56 @@ export function AdminUserDashboard({
   inspections,
   events,
   usage,
+  currentAdminId,
 }: {
   profile: AccountProfile;
   inspections: Inspection[];
   events: Event[];
   usage: Usage[];
+  currentAdminId: string;
 }) {
+  const router = useRouter();
+  const supabase = createClient();
+  const [busy, setBusy] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [username, setUsername] = useState(profile.username);
+
+  const act = async (action: string, value?: string) => {
+    setBusy(action);
+    setMessage(null);
+    const { error } = await supabase.rpc('admin_update_user', {
+      p_target_user_id: profile.id,
+      p_action: action,
+      p_value: value ?? null,
+    });
+    setMessage(
+      error
+        ? error.message
+        : 'Account updated and added to the admin audit log.',
+    );
+    setBusy(null);
+    if (!error) router.refresh();
+  };
+
+  const downloadReport = (inspection: Inspection) => {
+    if (!inspection.report) return;
+    const blob = new Blob([JSON.stringify(inspection.report, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `${inspection.file_name.replace(/[^a-zA-Z0-9._-]/g, '_')}.deepframe.json`;
+    anchor.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
+  };
+
+  const totalInspections = usage.reduce(
+    (sum, day) => sum + day.inspections_count,
+    0,
+  );
+  const totalCleaned = usage.reduce((sum, day) => sum + day.removals_count, 0);
+
   return (
     <main className="min-h-screen bg-[#03040a] px-4 py-6 text-white sm:px-6 sm:py-10">
       <div className="mx-auto max-w-6xl">
@@ -91,6 +152,99 @@ export function AdminUserDashboard({
             Use this restricted view only for a documented security, safety,
             abuse, support, privacy, or legal reason.
           </p>
+          {message ? (
+            <p
+              role="status"
+              className="mt-5 rounded-xl border border-cyan-100/10 bg-cyan-100/[0.04] px-4 py-3 text-xs text-cyan-50/70"
+            >
+              {message}
+            </p>
+          ) : null}
+        </section>
+
+        <section className="glass-panel mt-5 rounded-[2rem] p-6 sm:p-8">
+          <div className="flex items-center gap-2">
+            <UserCog className="size-5 text-cyan-200/70" />
+            <h2 className="text-lg font-semibold">Account controls</h2>
+          </div>
+          <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_170px_170px_auto]">
+            <div className="flex gap-2">
+              <Input
+                aria-label="Account username"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                className="h-11 border-white/10 bg-black/20"
+              />
+              <Button
+                type="button"
+                size="icon"
+                variant="outline"
+                disabled={busy !== null || username === profile.username}
+                onClick={() => void act('set_username', username)}
+                aria-label="Save username"
+                className="size-11 shrink-0 rounded-xl border-white/10 bg-white/[0.03]"
+              >
+                <Save className="size-4" />
+              </Button>
+            </div>
+            <select
+              aria-label="Account plan"
+              value={profile.plan}
+              disabled={busy !== null}
+              onChange={(event) => void act('set_plan', event.target.value)}
+              className="h-11 rounded-xl border border-white/10 bg-[#0b0d14] px-3 text-xs text-white/65"
+            >
+              <option value="free">Free</option>
+              <option value="pro">Pro</option>
+              <option value="studio">Studio</option>
+            </select>
+            <select
+              aria-label="Account role"
+              value={profile.role}
+              disabled={busy !== null || currentAdminId === profile.id}
+              onChange={(event) => void act('set_role', event.target.value)}
+              className="h-11 rounded-xl border border-white/10 bg-[#0b0d14] px-3 text-xs text-white/65 disabled:opacity-40"
+            >
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={busy !== null}
+                onClick={() => void act('reset_usage')}
+                className="h-11 rounded-xl border-white/10 bg-white/[0.03] text-white/60"
+              >
+                <RotateCcw className="size-4" /> Reset today
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={busy !== null || currentAdminId === profile.id}
+                onClick={() =>
+                  void act(
+                    profile.account_status === 'banned' ? 'unban' : 'ban',
+                  )
+                }
+                className="h-11 rounded-xl border-red-100/10 bg-red-100/[0.03] text-red-100/65"
+              >
+                <Ban className="size-4" />{' '}
+                {profile.account_status === 'banned' ? 'Unban' : 'Ban'}
+              </Button>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-2 text-[9px] text-white/28 sm:grid-cols-4">
+            <p>Created {new Date(profile.created_at).toLocaleString()}</p>
+            <p>
+              Last seen{' '}
+              {profile.last_seen_at
+                ? new Date(profile.last_seen_at).toLocaleString()
+                : 'never'}
+            </p>
+            <p>{totalInspections} inspections in visible usage history</p>
+            <p>{totalCleaned} metadata cleans in visible usage history</p>
+          </div>
         </section>
 
         <section className="mt-5 grid gap-5 lg:grid-cols-[1.45fr_.55fr]">
@@ -120,18 +274,50 @@ export function AdminUserDashboard({
                           SHA-256 {item.sha256}
                         </p>
                       ) : null}
+                      {item.failure_reason ? (
+                        <p className="mt-2 text-[9px] text-red-100/55">
+                          {item.failure_reason}
+                        </p>
+                      ) : null}
+                      {item.hidden_from_history_at ? (
+                        <p className="mt-2 text-[9px] text-amber-100/50">
+                          Hidden by user{' '}
+                          {new Date(
+                            item.hidden_from_history_at,
+                          ).toLocaleString()}
+                        </p>
+                      ) : null}
                     </div>
-                    {item.status === 'complete' ? (
-                      <Link href={`/?inspection=${item.id}`}>
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      <AdminAssetActions
+                        inspectionId={item.id}
+                        hasOriginal={Boolean(item.storage_path)}
+                        hasCleaned={Boolean(item.cleaned_storage_path)}
+                      />
+                      {item.report ? (
                         <Button
+                          type="button"
                           size="sm"
                           variant="outline"
-                          className="rounded-lg border-white/10 bg-white/[0.025]"
+                          onClick={() => downloadReport(item)}
+                          className="rounded-lg border-white/10 bg-white/[0.025] text-white/60"
                         >
-                          <Eye className="size-3.5" /> Open report
+                          <FileJson className="size-3.5" /> Report JSON
                         </Button>
-                      </Link>
-                    ) : null}
+                      ) : null}
+                      {item.status === 'complete' ? (
+                        <Link href={`/?inspection=${item.id}`}>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="rounded-lg border-white/10 bg-white/[0.025]"
+                          >
+                            <Eye className="size-3.5" /> Open report
+                          </Button>
+                        </Link>
+                      ) : null}
+                    </div>
                   </div>
                 ))
               ) : (
@@ -168,7 +354,9 @@ export function AdminUserDashboard({
               </div>
             </article>
             <article className="glass-panel rounded-[2rem] p-6">
-              <h2 className="text-lg font-semibold">Activity</h2>
+              <h2 className="flex items-center gap-2 text-lg font-semibold">
+                <Activity className="size-4 text-cyan-200" /> Activity
+              </h2>
               <div className="mt-4 max-h-[520px] space-y-2 overflow-auto">
                 {events.map((event) => (
                   <div
@@ -181,6 +369,16 @@ export function AdminUserDashboard({
                     <p className="mt-1 text-[8px] text-white/25">
                       {new Date(event.created_at).toLocaleString()}
                     </p>
+                    {Object.keys(event.event_data ?? {}).length ? (
+                      <details className="mt-2">
+                        <summary className="cursor-pointer text-[8px] uppercase tracking-[0.12em] text-white/30">
+                          Event details
+                        </summary>
+                        <pre className="mt-2 overflow-auto whitespace-pre-wrap break-all rounded-lg bg-black/25 p-2 font-mono text-[8px] leading-4 text-white/35">
+                          {JSON.stringify(event.event_data, null, 2)}
+                        </pre>
+                      </details>
+                    ) : null}
                   </div>
                 ))}
               </div>

@@ -50,6 +50,7 @@ export default async function AdminUserPage({
       inspections={inspections.data ?? []}
       events={events.data ?? []}
       usage={usage.data ?? []}
+      currentAdminId={authData.user.id}
     />
   );
 }

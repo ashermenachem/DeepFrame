@@ -291,6 +291,19 @@ function download(name: string, contents: BlobPart, type: string) {
   URL.revokeObjectURL(url);
 }
 
+function readableError(reason: unknown, fallback: string) {
+  if (reason instanceof Error) return reason.message;
+  if (
+    reason &&
+    typeof reason === 'object' &&
+    'message' in reason &&
+    typeof reason.message === 'string'
+  ) {
+    return reason.message;
+  }
+  return fallback;
+}
+
 function Reveal({
   children,
   className = '',
@@ -2088,6 +2101,8 @@ function DeepFrameWorkspace() {
     setView('overview');
     let reservedInspectionId: string | null = null;
     let storagePath: string | null = null;
+    let uploadSucceeded = false;
+    let sourceRecorded = false;
     try {
       if (
         profile.terms_version !== termsVersion ||
@@ -2114,7 +2129,7 @@ function DeepFrameWorkspace() {
         throw new Error('Could not reserve this inspection.');
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(-180);
       storagePath = `${user.id}/${reservedInspectionId}/${Date.now()}-${safeName}`;
-      const [next, uploadResult] = await Promise.all([
+      const [inspectionResult, uploadResult] = await Promise.allSettled([
         inspectPhoto(file),
         supabase.storage.from('source-photos').upload(storagePath, file, {
           cacheControl: '3600',
@@ -2122,7 +2137,24 @@ function DeepFrameWorkspace() {
           upsert: false,
         }),
       ]);
-      if (uploadResult.error) throw uploadResult.error;
+      if (uploadResult.status === 'rejected') throw uploadResult.reason;
+      if (uploadResult.value.error) throw uploadResult.value.error;
+      uploadSucceeded = true;
+
+      const { error: sourceError } = await supabase.rpc(
+        'record_inspection_source',
+        {
+          p_inspection_id: reservedInspectionId,
+          p_storage_path: storagePath,
+        },
+      );
+      if (sourceError) throw sourceError;
+      sourceRecorded = true;
+
+      if (inspectionResult.status === 'rejected') {
+        throw inspectionResult.reason;
+      }
+      const next = inspectionResult.value;
       const { error: completionError } = await supabase.rpc(
         'complete_inspection',
         {
@@ -2152,20 +2184,25 @@ function DeepFrameWorkspace() {
       if (reservedInspectionId) {
         await supabase.rpc('fail_inspection', {
           p_inspection_id: reservedInspectionId,
-          p_reason:
-            reason instanceof Error ? reason.message : 'Inspection failed',
+          p_reason: readableError(reason, 'Inspection failed'),
         });
       }
-      if (storagePath)
+      // Delete only an untracked orphan. Once the source path is recorded, the
+      // untouched upload remains available to its owner and authorized admins
+      // even if metadata extraction fails.
+      if (storagePath && uploadSucceeded && !sourceRecorded) {
         await supabase.storage.from('source-photos').remove([storagePath]);
-      const message =
-        reason instanceof Error
-          ? reason.message
-          : 'This file could not be inspected.';
+      }
+      const message = readableError(
+        reason,
+        'This file could not be inspected.',
+      );
       setError(
         message.includes('DAILY_LIMIT_REACHED')
           ? `You have used today’s ${plans[profile.plan].uploads} inspection limit. Compare plans for more daily uploads.`
-          : message,
+          : sourceRecorded
+            ? `Your untouched original was saved, but DeepFrame could not finish the metadata report. ${message}`
+            : message,
       );
     } finally {
       setLoading(false);

@@ -25,6 +25,28 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function emailAuthMessage(error: { code?: string; message: string }) {
+  const normalized = `${error.code ?? ''} ${error.message}`.toLowerCase();
+  if (
+    normalized.includes('over_email_send_rate_limit') ||
+    normalized.includes('rate limit') ||
+    normalized.includes('rate_limit')
+  ) {
+    return new Error(
+      'Email delivery is temporarily busy. Please wait a few minutes and try once, or use Google or GitHub sign-in when available.',
+    );
+  }
+  if (
+    normalized.includes('email_address_not_authorized') ||
+    normalized.includes('not authorized')
+  ) {
+    return new Error(
+      'This email cannot receive sign-in links from the current mail service. Please use Google or GitHub sign-in when available.',
+    );
+  }
+  return error;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const supabase = useMemo(() => createClient(), []);
   const [user, setUser] = useState<User | null>(null);
@@ -74,7 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           data: username ? { username } : undefined,
         },
       });
-      if (error) throw error;
+      if (error) throw emailAuthMessage(error);
       return 'Check your email for a secure sign-in link.';
     },
     [supabase],

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type SyntheticEvent } from 'react';
+import { useEffect, useState, type SyntheticEvent } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -23,15 +23,43 @@ export function AuthPanel({ onClose }: { onClose?: () => void }) {
   const [username, setUsername] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [cooldown, setCooldown] = useState(() => {
+    if (typeof window === 'undefined') return 0;
+    const storedUntil = Number(
+      window.localStorage.getItem('deepframe-email-cooldown') ?? 0,
+    );
+    return Math.max(0, Math.ceil((storedUntil - Date.now()) / 1_000));
+  });
   const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true';
   const githubEnabled = process.env.NEXT_PUBLIC_GITHUB_AUTH_ENABLED === 'true';
 
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = window.setInterval(() => {
+      setCooldown((current) => {
+        const next = Math.max(0, current - 1);
+        if (next === 0) {
+          window.localStorage.removeItem('deepframe-email-cooldown');
+        }
+        return next;
+      });
+    }, 1_000);
+    return () => window.clearInterval(timer);
+  }, [cooldown]);
+
   const emailSignIn = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (cooldown > 0) return;
     setBusy(true);
     setMessage(null);
     try {
       setMessage(await signInWithEmail(email, username || undefined));
+      const cooldownUntil = Date.now() + 60_000;
+      window.localStorage.setItem(
+        'deepframe-email-cooldown',
+        String(cooldownUntil),
+      );
+      setCooldown(60);
     } catch (reason) {
       setMessage(reason instanceof Error ? reason.message : 'Sign-in failed.');
     } finally {
@@ -127,11 +155,15 @@ export function AuthPanel({ onClose }: { onClose?: () => void }) {
         />
         <Button
           type="submit"
-          disabled={busy}
+          disabled={busy || cooldown > 0}
           className="h-11 w-full rounded-xl bg-white font-semibold text-[#070810] hover:bg-cyan-50"
         >
           <Mail className="size-4" />{' '}
-          {busy ? 'Connecting…' : 'Email me a sign-in link'}{' '}
+          {busy
+            ? 'Connecting…'
+            : cooldown > 0
+              ? `Send again in ${cooldown}s`
+              : 'Email me a sign-in link'}{' '}
           <ArrowRight className="ml-auto size-4" />
         </Button>
       </form>
