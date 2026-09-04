@@ -70,6 +70,7 @@ import {
   findField,
   formatBytes,
   inspectPhoto,
+  preparePhotoInspector,
   type MetadataField,
   type PhotoReport,
 } from '@/lib/photo-inspector';
@@ -402,6 +403,8 @@ function UploadButton({
         variant="outline"
         className="h-8 rounded-full border-white/10 bg-white/[0.045] px-3 font-mono text-[9px] text-white/65 shadow-none hover:border-cyan-200/25 hover:bg-cyan-200/[0.08] hover:text-cyan-50"
         onClick={() => inputRef.current?.click()}
+        onFocus={preparePhotoInspector}
+        onPointerEnter={preparePhotoInspector}
       >
         <Upload className="size-3.5 text-cyan-200" /> {label}
       </Button>
@@ -459,8 +462,11 @@ function UploadSurface({
             type="button"
             aria-label="Choose a photo to inspect"
             onClick={() => inputRef.current?.click()}
+            onFocus={preparePhotoInspector}
+            onPointerEnter={preparePhotoInspector}
             onDragEnter={(event) => {
               event.preventDefault();
+              preparePhotoInspector();
               setDragging(true);
             }}
             onDragOver={(event) => event.preventDefault()}
@@ -1866,10 +1872,7 @@ function DeepFrameWorkspace() {
     setGroup('All');
     setView('overview');
     try {
-      const [next] = await Promise.all([
-        inspectPhoto(file),
-        new Promise<void>((resolve) => window.setTimeout(resolve, 1100)),
-      ]);
+      const next = await inspectPhoto(file);
       setReport(next);
       setPreviewUrl(URL.createObjectURL(file));
     } catch (reason) {

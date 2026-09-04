@@ -10,7 +10,7 @@ import {
 } from 'motion/react';
 import { DeepFrameMark } from '@/components/deepframe-logo';
 
-const introKey = 'deepframe-intro-seen-v2';
+const introKey = 'deepframe-intro-seen-v3';
 
 export const socials = [
   {
@@ -81,18 +81,18 @@ export function IntroSequence({ onComplete }: { onComplete?: () => void }) {
 
   const close = useCallback(() => {
     setVisible(false);
-    window.sessionStorage.setItem(introKey, 'true');
+    window.localStorage.setItem(introKey, 'true');
     complete();
   }, [complete]);
 
   useEffect(() => {
-    if (window.sessionStorage.getItem(introKey)) {
+    if (window.localStorage.getItem(introKey)) {
       complete();
       return;
     }
 
     const frame = window.requestAnimationFrame(() => setVisible(true));
-    const timer = window.setTimeout(close, reduceMotion ? 1200 : 5000);
+    const timer = window.setTimeout(close, reduceMotion ? 600 : 2800);
 
     return () => {
       window.cancelAnimationFrame(frame);
@@ -136,7 +136,7 @@ export function IntroSequence({ onComplete }: { onComplete?: () => void }) {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, scale: reduceMotion ? 1 : 1.025 }}
           transition={{
-            duration: reduceMotion ? 0.12 : 0.65,
+            duration: reduceMotion ? 0.12 : 0.45,
             ease: [0.76, 0, 0.24, 1],
           }}
         >
@@ -197,7 +197,7 @@ export function IntroSequence({ onComplete }: { onComplete?: () => void }) {
                   rotate: reduceMotion ? 0 : 330,
                 }}
                 transition={{
-                  duration: reduceMotion ? 0 : 2.4,
+                  duration: reduceMotion ? 0 : 1.35,
                   ease: [0.16, 1, 0.3, 1],
                 }}
               />
@@ -213,7 +213,7 @@ export function IntroSequence({ onComplete }: { onComplete?: () => void }) {
                   rotate: reduceMotion ? 0 : -250,
                 }}
                 transition={{
-                  duration: reduceMotion ? 0 : 2.6,
+                  duration: reduceMotion ? 0 : 1.5,
                   delay: 0.08,
                   ease: [0.16, 1, 0.3, 1],
                 }}
@@ -271,7 +271,10 @@ export function IntroSequence({ onComplete }: { onComplete?: () => void }) {
               className="h-full origin-left bg-gradient-to-r from-cyan-300 via-sky-300 to-violet-300"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
-              transition={{ duration: reduceMotion ? 1 : 4.7, ease: 'linear' }}
+              transition={{
+                duration: reduceMotion ? 0.5 : 2.65,
+                ease: 'linear',
+              }}
             />
           </div>
           <p className="absolute bottom-5 font-mono text-[7px] uppercase tracking-[0.22em] text-white/18 sm:bottom-7">

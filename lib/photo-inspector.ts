@@ -1,5 +1,3 @@
-import ExifReader from 'exifreader';
-
 export type MetadataField = {
   group: string;
   name: string;
@@ -7,6 +5,19 @@ export type MetadataField = {
   display: string;
   raw: unknown;
 };
+
+type ExifReaderApi = typeof import('exifreader');
+
+let exifReaderPromise: Promise<ExifReaderApi> | undefined;
+
+function loadExifReader() {
+  exifReaderPromise ??= import('exifreader');
+  return exifReaderPromise;
+}
+
+export function preparePhotoInspector() {
+  void loadExifReader();
+}
 
 export type StructureItem = {
   type: string;
@@ -307,8 +318,16 @@ function numericField(fields: MetadataField[], matcher: RegExp) {
 export async function inspectPhoto(file: File): Promise<PhotoReport> {
   const buffer = await file.arrayBuffer();
   const bytes = new Uint8Array(buffer);
+  const imagePromise = decodedDimensions(file);
+  const hashesPromise = Promise.all([
+    digest('SHA-1', buffer),
+    digest('SHA-256', buffer),
+    digest('SHA-384', buffer),
+    digest('SHA-512', buffer),
+  ]);
   let metadata: Record<string, unknown> = {};
   try {
+    const ExifReader = await loadExifReader();
     metadata = ExifReader.load(buffer, {
       expanded: true,
       includeOffsets: true,
@@ -321,12 +340,9 @@ export async function inspectPhoto(file: File): Promise<PhotoReport> {
 
   const detectedType = detectFileType(bytes);
   const extension = file.name.includes('.') ? file.name.split('.').pop()?.toLowerCase() ?? '' : '';
-  const image = await decodedDimensions(file);
-  const [sha1, sha256, sha384, sha512] = await Promise.all([
-    digest('SHA-1', buffer.slice(0)),
-    digest('SHA-256', buffer.slice(0)),
-    digest('SHA-384', buffer.slice(0)),
-    digest('SHA-512', buffer.slice(0)),
+  const [image, [sha1, sha256, sha384, sha512]] = await Promise.all([
+    imagePromise,
+    hashesPromise,
   ]);
   const systemFields: MetadataField[] = [
     systemField('File name', file.name, file.name),

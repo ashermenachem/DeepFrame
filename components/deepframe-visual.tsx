@@ -1,6 +1,11 @@
 'use client';
 
-import { useId, type PointerEvent as ReactPointerEvent } from 'react';
+import {
+  useEffect,
+  useId,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from 'react';
 import {
   motion,
   useMotionValue,
@@ -36,6 +41,7 @@ function Corner({ className }: { className: string }) {
  */
 export function DeepFrameVisual({ className = '' }: { className?: string }) {
   const reduceMotion = useReducedMotion();
+  const [canRunContinuousMotion, setCanRunContinuousMotion] = useState(false);
   const rawId = useId().replace(/:/g, '');
   const skyId = `${rawId}-sky`;
   const hazeId = `${rawId}-haze`;
@@ -49,6 +55,15 @@ export function DeepFrameVisual({ className = '' }: { className?: string }) {
   const rotateY = useTransform(smoothX, [-0.5, 0.5], [-9, 9]);
   const lightX = useTransform(smoothX, [-0.5, 0.5], [-42, 42]);
   const lightY = useTransform(smoothY, [-0.5, 0.5], [-28, 28]);
+  const animateDecorations = !reduceMotion && canRunContinuousMotion;
+
+  useEffect(() => {
+    const query = window.matchMedia('(pointer: fine) and (min-width: 768px)');
+    const update = () => setCanRunContinuousMotion(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (reduceMotion || event.pointerType === 'touch') return;
@@ -74,7 +89,7 @@ export function DeepFrameVisual({ className = '' }: { className?: string }) {
         <motion.div
           className="absolute left-[12%] top-[12%] size-[54%] rounded-full bg-cyan-400/[0.13] blur-[72px]"
           animate={
-            reduceMotion
+            !animateDecorations
               ? undefined
               : {
                   x: [0, 24, -8, 0],
@@ -87,7 +102,7 @@ export function DeepFrameVisual({ className = '' }: { className?: string }) {
         <motion.div
           className="absolute bottom-[8%] right-[3%] size-[48%] rounded-full bg-violet-500/[0.15] blur-[82px]"
           animate={
-            reduceMotion
+            !animateDecorations
               ? undefined
               : {
                   x: [0, -22, 10, 0],
@@ -100,7 +115,7 @@ export function DeepFrameVisual({ className = '' }: { className?: string }) {
         <motion.div
           className="absolute bottom-[14%] left-[26%] h-[35%] w-[50%] rounded-full bg-emerald-300/[0.11] blur-[76px]"
           animate={
-            reduceMotion
+            !animateDecorations
               ? undefined
               : { opacity: [0.42, 0.8, 0.42], scale: [0.9, 1.08, 0.9] }
           }
@@ -124,7 +139,7 @@ export function DeepFrameVisual({ className = '' }: { className?: string }) {
       <motion.div
         className="absolute inset-[7%_9%_8%] sm:inset-[7%_14%_8%]"
         style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-        animate={reduceMotion ? undefined : { y: [0, -9, 0] }}
+        animate={animateDecorations ? { y: [0, -9, 0] } : undefined}
         transition={{ duration: 6.5, ease: 'easeInOut', repeat: Infinity }}
       >
         <div
@@ -251,14 +266,14 @@ export function DeepFrameVisual({ className = '' }: { className?: string }) {
 
               <motion.div
                 className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-transparent via-cyan-300/[0.06] to-transparent"
-                initial={reduceMotion ? false : { y: '-110%' }}
+                initial={animateDecorations ? { y: '-110%' } : false}
                 animate={
-                  reduceMotion ? { y: '240%' } : { y: ['-110%', '620%'] }
+                  animateDecorations ? { y: ['-110%', '620%'] } : { y: '240%' }
                 }
                 transition={{
                   duration: 4.2,
                   ease: 'linear',
-                  repeat: reduceMotion ? 0 : Infinity,
+                  repeat: animateDecorations ? Infinity : 0,
                   repeatDelay: 0.7,
                 }}
               >
@@ -306,7 +321,7 @@ export function DeepFrameVisual({ className = '' }: { className?: string }) {
         >
           <motion.div
             className="flex items-center gap-2 rounded-full border border-cyan-100/[0.16] bg-[#0a1119]/75 px-3 py-2 shadow-[0_16px_40px_rgba(0,0,0,.38),0_0_28px_rgba(103,232,249,.08)] backdrop-blur-xl"
-            animate={reduceMotion ? undefined : { y: [0, -6, 0] }}
+            animate={animateDecorations ? { y: [0, -6, 0] } : undefined}
             transition={{
               duration: 4.4,
               delay: 0.25,
@@ -332,7 +347,7 @@ export function DeepFrameVisual({ className = '' }: { className?: string }) {
         >
           <motion.div
             className="flex items-center gap-2 rounded-full border border-violet-100/[0.16] bg-[#0a0c16]/75 px-3 py-2 shadow-[0_16px_40px_rgba(0,0,0,.38),0_0_30px_rgba(167,139,250,.09)] backdrop-blur-xl"
-            animate={reduceMotion ? undefined : { y: [0, 6, 0] }}
+            animate={animateDecorations ? { y: [0, 6, 0] } : undefined}
             transition={{ duration: 5.2, ease: 'easeInOut', repeat: Infinity }}
           >
             <Aperture className="size-3 text-violet-300" />
@@ -353,7 +368,7 @@ export function DeepFrameVisual({ className = '' }: { className?: string }) {
         >
           <motion.div
             className="flex items-center gap-2 rounded-full border border-emerald-100/[0.15] bg-[#08120f]/80 px-3 py-2 shadow-[0_16px_40px_rgba(0,0,0,.38),0_0_30px_rgba(110,231,183,.08)] backdrop-blur-xl"
-            animate={reduceMotion ? undefined : { y: [0, -5, 0] }}
+            animate={animateDecorations ? { y: [0, -5, 0] } : undefined}
             transition={{
               duration: 4.8,
               delay: 0.6,
