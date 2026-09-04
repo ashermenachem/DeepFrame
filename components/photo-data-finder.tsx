@@ -56,6 +56,7 @@ import {
   Sparkles,
   TerminalSquare,
   Upload,
+  UserRound,
   X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -66,6 +67,8 @@ import { AnalysisLoader } from '@/components/analysis-loader';
 import { DeepFrameVisual } from '@/components/deepframe-visual';
 import { TermsGate } from '@/components/terms-gate';
 import { DeepFrameLogo } from '@/components/deepframe-logo';
+import { AuthPanel } from '@/components/auth-panel';
+import { useAuth } from '@/components/auth-provider';
 import {
   findField,
   formatBytes,
@@ -75,7 +78,10 @@ import {
   type PhotoReport,
 } from '@/lib/photo-inspector';
 import { buildShareText } from '@/lib/share-report';
-import { termsStorageKey, termsVersion } from '@/lib/legal';
+import { privacyVersion, termsStorageKey, termsVersion } from '@/lib/legal';
+import { plans } from '@/lib/account';
+import { removePrivacyMetadata } from '@/lib/metadata-remover';
+import { createClient } from '@/lib/supabase/client';
 
 type View = 'overview' | 'metadata' | 'structure' | 'share' | 'raw';
 
@@ -311,10 +317,13 @@ function Reveal({
 function AppHeader({
   onNew,
   busy = false,
+  onSignIn,
 }: {
   onNew?: (file: File) => void;
   busy?: boolean;
+  onSignIn: () => void;
 }) {
+  const { user, profile } = useAuth();
   return (
     <header className="sticky top-0 z-40 px-3 pt-3 sm:px-5">
       <div className="glass-nav mx-auto flex h-14 max-w-[1480px] items-center justify-between rounded-2xl px-3 sm:px-4">
@@ -353,7 +362,7 @@ function AppHeader({
         <div className="flex items-center gap-3">
           <div className="hidden items-center gap-2 rounded-full border border-emerald-200/10 bg-emerald-200/[0.045] px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.12em] text-emerald-100/55 sm:flex">
             <span className="size-1.5 rounded-full bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,.9)]" />
-            On-device
+            Private vault
           </div>
           <Link
             href="/terms"
@@ -371,6 +380,25 @@ function AppHeader({
           >
             <GitBranch className="size-3.5" />
           </a>
+          {user ? (
+            <Link
+              href="/profile"
+              className="inline-flex h-8 items-center gap-2 rounded-full border border-cyan-100/15 bg-cyan-100/[0.055] px-3 text-[9px] text-cyan-50/70 transition hover:bg-cyan-100/[0.1]"
+            >
+              <UserRound className="size-3.5" />
+              <span className="hidden sm:inline">
+                {profile?.username ?? 'Profile'}
+              </span>
+            </Link>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={onSignIn}
+              className="h-8 rounded-full border-cyan-100/15 bg-cyan-100/[0.055] px-3 text-[9px] text-cyan-50/70"
+            >
+              Sign in
+            </Button>
+          )}
           {onNew && !busy && <UploadButton onFile={onNew} />}
         </div>
       </div>
@@ -509,7 +537,7 @@ function UploadSurface({
                 </div>
               </div>
               <span className="mt-8 rounded-full border border-white/10 bg-white/[0.045] px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-white/45">
-                Stays on this device
+                Saved to your private account
               </span>
               <p className="mt-5 text-2xl font-semibold tracking-[-0.045em] text-white sm:text-3xl">
                 {dragging
@@ -620,9 +648,9 @@ function Landing({
             </div>
             <div className="mt-10 grid max-w-lg grid-cols-3 border-t border-white/[0.08] pt-5">
               {[
-                ['100%', 'on-device'],
+                ['Private', 'account vault'],
                 ['4×', 'file fingerprints'],
-                ['0', 'cloud uploads'],
+                ['Saved', 'account history'],
               ].map(([value, label]) => (
                 <div
                   key={label}
@@ -682,8 +710,9 @@ function Landing({
               One drop. The full story.
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-white/42 sm:text-base">
-              Pick the original photo. DeepFrame reads it on your device and
-              gives you a clear answer—no account or upload needed.
+              Pick the original photo. DeepFrame analyzes it in your browser,
+              saves the report privately, and makes it available across your
+              devices.
             </p>
           </Reveal>
           <Reveal className="mx-auto max-w-[1040px]" delay={0.08}>
@@ -855,18 +884,19 @@ function Landing({
                 <LockKeyhole className="size-3" /> Private by architecture
               </div>
               <h2 className="mt-6 text-4xl font-semibold leading-[1.04] tracking-[-0.055em] text-white sm:text-6xl">
-                Your photo never leaves your device.
+                Private by default. Clear by design.
               </h2>
               <p className="mt-6 max-w-xl text-sm leading-7 text-white/42 sm:text-base">
-                Every byte is read by your browser. There is no image server, no
-                account history, and no cloud copy waiting somewhere else.
+                Analysis happens in your browser, then your original and report
+                are saved in private account storage. Other users cannot search
+                for your profile or see your files.
               </p>
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 {[
-                  [CloudOff, 'No cloud transfer'],
-                  [Cpu, 'On-device decoding'],
-                  [Database, 'No stored library'],
-                  [ShieldCheck, 'Privacy-first sharing'],
+                  [LockKeyhole, 'Private file storage'],
+                  [Cpu, 'Browser-side decoding'],
+                  [Database, 'Cross-device history'],
+                  [ShieldCheck, 'Restricted admin access'],
                 ].map(([ItemIcon, label]) => {
                   const Icon = ItemIcon as typeof CloudOff;
                   return (
@@ -914,6 +944,86 @@ function Landing({
           </div>
         </section>
 
+        <section
+          id="plans"
+          className="scroll-mt-20 px-4 py-24 sm:px-6 sm:py-32"
+        >
+          <Reveal className="mx-auto mb-12 max-w-3xl text-center">
+            <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-violet-200/55">
+              Choose your depth
+            </p>
+            <h2 className="mt-4 text-4xl font-semibold tracking-[-0.055em] text-white sm:text-6xl">
+              Start free. Go further when you need it.
+            </h2>
+            <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-white/42">
+              Paid checkout is coming soon. Every new account starts on Free
+              today.
+            </p>
+          </Reveal>
+          <div className="mx-auto grid max-w-5xl gap-3 md:grid-cols-3">
+            {Object.entries(plans).map(([id, plan]) => (
+              <Reveal
+                key={id}
+                delay={id === 'pro' ? 0.05 : id === 'studio' ? 0.1 : 0}
+              >
+                <article
+                  className={`glass-panel relative h-full rounded-[2rem] p-6 ${id === 'pro' ? 'border-cyan-200/25 bg-cyan-200/[0.045]' : ''}`}
+                >
+                  {id === 'pro' ? (
+                    <span className="absolute right-5 top-5 rounded-full bg-cyan-100 px-2.5 py-1 font-mono text-[7px] font-semibold uppercase text-[#071015]">
+                      Best value
+                    </span>
+                  ) : null}
+                  <h3 className="text-lg font-semibold text-white/88">
+                    {plan.name}
+                  </h3>
+                  <p className="mt-4 text-4xl font-semibold tracking-[-0.05em] text-white">
+                    {plan.price}
+                    <span className="text-xs font-normal text-white/30">
+                      /month
+                    </span>
+                  </p>
+                  <p className="mt-4 min-h-12 text-xs leading-5 text-white/38">
+                    {plan.description}
+                  </p>
+                  <div className="mt-6 space-y-2 text-[11px] text-white/58">
+                    <p>
+                      <Check className="mr-2 inline size-3 text-emerald-300" />
+                      {plan.uploads} inspection{plan.uploads === 1 ? '' : 's'}{' '}
+                      every day
+                    </p>
+                    <p>
+                      <Check className="mr-2 inline size-3 text-emerald-300" />
+                      Private cross-device history
+                    </p>
+                    <p>
+                      <Check className="mr-2 inline size-3 text-emerald-300" />
+                      {plan.removals
+                        ? `${plan.removals} metadata cleans every day`
+                        : 'Metadata cleaner available on paid plans'}
+                    </p>
+                  </div>
+                  {id === 'free' ? (
+                    <Link
+                      href="/login"
+                      className="mt-7 flex h-10 w-full items-center justify-center rounded-xl bg-white text-[12px] font-semibold text-[#070810] transition hover:bg-cyan-50"
+                    >
+                      Create free account
+                    </Link>
+                  ) : (
+                    <Button
+                      disabled
+                      className="mt-7 w-full rounded-xl bg-white/[0.07] text-white/35"
+                    >
+                      Payments coming soon
+                    </Button>
+                  )}
+                </article>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
         <section className="px-4 pb-24 pt-12 text-center sm:px-6 sm:pb-32 sm:pt-20">
           <Reveal className="mx-auto max-w-4xl">
             <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-cyan-200/55">
@@ -952,7 +1062,7 @@ function Landing({
               wordmarkClassName="text-sm"
             />
             <p className="mt-1 font-mono text-[7px] uppercase tracking-[0.16em] text-white/22">
-              Every field · Zero uploads
+              Every field · Private history
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:items-end">
@@ -973,6 +1083,9 @@ function ProjectLinks() {
         className="inline-flex items-center gap-1.5 transition hover:text-violet-100/75"
       >
         <Scale className="size-3" /> Terms
+      </Link>
+      <Link href="/privacy" className="transition hover:text-emerald-100/75">
+        Privacy
       </Link>
       <a
         href={repositoryUrl}
@@ -1590,6 +1703,12 @@ function Results({
   setGroup,
   copiedId,
   onCopy,
+  onShare,
+  onExport,
+  onRemoveMetadata,
+  removeBusy,
+  canRemoveMetadata,
+  notice,
 }: {
   report: PhotoReport;
   previewUrl: string | null;
@@ -1601,15 +1720,23 @@ function Results({
   setGroup: (value: string) => void;
   copiedId: string | null;
   onCopy: (text: string, id: string) => void;
+  onShare: () => void;
+  onExport: () => void;
+  onRemoveMetadata: () => void;
+  removeBusy: boolean;
+  canRemoveMetadata: boolean;
+  notice: string | null;
 }) {
   const reduceMotion = useReducedMotion();
   const stem = report.file.name.replace(/\.[^.]+$/, '') || 'photo';
-  const exportJson = () =>
+  const exportJson = () => {
     download(
       `${stem}-metadata.json`,
       JSON.stringify(report, null, 2),
       'application/json',
     );
+    onExport();
+  };
   return (
     <motion.div
       id="top"
@@ -1627,6 +1754,14 @@ function Results({
           {report.fields.length} details found · {report.file.detectedType}
         </span>
       </div>
+      {notice ? (
+        <div
+          role="status"
+          className="mb-2 flex items-start gap-3 rounded-xl border border-cyan-100/12 bg-cyan-100/[0.045] px-4 py-3 text-xs text-cyan-50/65"
+        >
+          <Info className="mt-0.5 size-3.5 shrink-0" /> {notice}
+        </div>
+      ) : null}
       <div className="glass-panel grid min-h-[calc(100vh-144px)] overflow-hidden rounded-[1.6rem] lg:grid-cols-[260px_minmax(0,1fr)] lg:rounded-[2rem]">
         <aside className="border-b border-white/[0.07] bg-black/10 lg:border-b-0 lg:border-r">
           <div className="relative m-3 aspect-[16/9] overflow-hidden rounded-2xl border border-white/[0.08] bg-black/35 shadow-[0_20px_60px_rgba(0,0,0,.28)] lg:aspect-[5/4]">
@@ -1682,7 +1817,7 @@ function Results({
             </p>
             <div className="mt-2 flex items-center gap-2 font-mono text-[7px] uppercase tracking-[0.1em] text-emerald-100/55">
               <ShieldCheck className="size-3" />
-              LOCAL ONLY / NO UPLOAD
+              PRIVATE ACCOUNT / SAVED
             </div>
           </div>
         </aside>
@@ -1704,7 +1839,10 @@ function Results({
               <Button
                 variant="outline"
                 className="h-9 rounded-full border-white/10 bg-white/[0.03] px-4 font-mono text-[8px] text-white/52 hover:border-cyan-200/20 hover:bg-cyan-200/[0.06] hover:text-cyan-50"
-                onClick={() => setView('share')}
+                onClick={() => {
+                  setView('share');
+                  onShare();
+                }}
               >
                 <Share2 className="size-3.5 text-cyan-100/70" />
                 Share
@@ -1716,6 +1854,19 @@ function Results({
               >
                 <Download className="size-3.5 text-violet-100/70" />
                 Download data
+              </Button>
+              <Button
+                variant="outline"
+                disabled={removeBusy}
+                className="h-9 rounded-full border-emerald-200/15 bg-emerald-200/[0.045] px-4 font-mono text-[8px] text-emerald-50/65 hover:border-emerald-200/25 hover:bg-emerald-200/[0.09] hover:text-emerald-50"
+                onClick={onRemoveMetadata}
+              >
+                <ShieldCheck className="size-3.5 text-emerald-200/75" />
+                {removeBusy
+                  ? 'Cleaning…'
+                  : canRemoveMetadata
+                    ? 'Remove metadata'
+                    : 'Unlock cleaner'}
               </Button>
             </div>
           </div>
@@ -1796,9 +1947,16 @@ function Results({
 }
 
 function DeepFrameWorkspace() {
+  const supabase = createClient();
+  const { user, profile, loading: authLoading, refreshProfile } = useAuth();
   const [report, setReport] = useState<PhotoReport | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [sourceFile, setSourceFile] = useState<File | null>(null);
+  const [sourcePath, setSourcePath] = useState<string | null>(null);
+  const [inspectionId, setInspectionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [removeBusy, setRemoveBusy] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   const [loadingFileName, setLoadingFileName] = useState<string>();
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -1806,16 +1964,60 @@ function DeepFrameWorkspace() {
   const [view, setView] = useState<View>('overview');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const reportRef = useRef<PhotoReport | null>(null);
+  const historyLoadedRef = useRef<string | null>(null);
 
   useEffect(() => {
     reportRef.current = report;
   }, [report]);
   useEffect(
     () => () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      if (previewUrl?.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
     },
     [previewUrl],
   );
+  useEffect(() => {
+    // oxlint-disable-next-line react/react-compiler -- Close the account gate after Supabase emits a signed-in user.
+    if (user) setAuthOpen(false);
+  }, [user]);
+  useEffect(() => {
+    if (authLoading || !user) return;
+    const requested = new URLSearchParams(window.location.search).get(
+      'inspection',
+    );
+    if (!requested || historyLoadedRef.current === requested) return;
+    historyLoadedRef.current = requested;
+    void (async () => {
+      setLoading(true);
+      setError(null);
+      const { data, error: historyError } = await supabase
+        .from('inspections')
+        .select('id,report,storage_path,status')
+        .eq('id', requested)
+        .eq('status', 'complete')
+        .single();
+      if (historyError || !data?.report) {
+        setError('That saved inspection is unavailable.');
+        setLoading(false);
+        return;
+      }
+      setInspectionId(data.id);
+      setSourcePath(data.storage_path);
+      setSourceFile(null);
+      setReport(data.report as PhotoReport);
+      if (data.storage_path) {
+        const { data: signed } = await supabase.storage
+          .from('source-photos')
+          .createSignedUrl(data.storage_path, 600);
+        setPreviewUrl(signed?.signedUrl ?? null);
+      }
+      await supabase.rpc('log_activity', {
+        p_event_type: 'report_viewed',
+        p_inspection_id: data.id,
+        p_event_data: { source: 'history' },
+      });
+      setLoading(false);
+    })();
+  }, [authLoading, supabase, user]);
   useEffect(() => {
     const context = (document as WebMcpDocument).modelContext;
     if (!context?.registerTool) return;
@@ -1865,23 +2067,105 @@ function DeepFrameWorkspace() {
   }, []);
 
   const handleFile = async (file: File) => {
+    if (authLoading) return;
+    if (!user || !profile) {
+      setAuthOpen(true);
+      return;
+    }
+    if (profile.account_status !== 'active') {
+      setError(
+        profile.account_status === 'banned'
+          ? 'This account is suspended. Contact support if you believe this is a mistake.'
+          : 'This account is locked while its deletion request is processed.',
+      );
+      return;
+    }
     setLoading(true);
     setLoadingFileName(file.name);
     setError(null);
     setSearch('');
     setGroup('All');
     setView('overview');
+    let reservedInspectionId: string | null = null;
+    let storagePath: string | null = null;
     try {
-      const next = await inspectPhoto(file);
+      if (
+        profile.terms_version !== termsVersion ||
+        profile.privacy_version !== privacyVersion
+      ) {
+        const { error: legalError } = await supabase.rpc('accept_legal', {
+          p_terms_version: termsVersion,
+          p_privacy_version: privacyVersion,
+        });
+        if (legalError) throw legalError;
+        await refreshProfile();
+      }
+      const { data: reservation, error: reservationError } = await supabase.rpc(
+        'consume_inspection',
+        {
+          p_file_name: file.name,
+          p_file_size: file.size,
+          p_mime_type: file.type || 'application/octet-stream',
+        },
+      );
+      if (reservationError) throw reservationError;
+      reservedInspectionId = reservation?.[0]?.inspection_id ?? null;
+      if (!reservedInspectionId)
+        throw new Error('Could not reserve this inspection.');
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(-180);
+      storagePath = `${user.id}/${reservedInspectionId}/${Date.now()}-${safeName}`;
+      const [next, uploadResult] = await Promise.all([
+        inspectPhoto(file),
+        supabase.storage.from('source-photos').upload(storagePath, file, {
+          cacheControl: '3600',
+          contentType: file.type || 'application/octet-stream',
+          upsert: false,
+        }),
+      ]);
+      if (uploadResult.error) throw uploadResult.error;
+      const { error: completionError } = await supabase.rpc(
+        'complete_inspection',
+        {
+          p_inspection_id: reservedInspectionId,
+          p_storage_path: storagePath,
+          p_detected_type: next.file.detectedType,
+          p_report: next,
+          p_field_count: next.fields.length,
+          p_sha256: next.file.sha256,
+        },
+      );
+      if (completionError) throw completionError;
       setReport(next);
-      setPreviewUrl(URL.createObjectURL(file));
+      setSourceFile(file);
+      setSourcePath(storagePath);
+      setInspectionId(reservedInspectionId);
+      setPreviewUrl((current) => {
+        if (current?.startsWith('blob:')) URL.revokeObjectURL(current);
+        return URL.createObjectURL(file);
+      });
     } catch (reason) {
       setReport(null);
       setPreviewUrl(null);
-      setError(
+      setSourceFile(null);
+      setSourcePath(null);
+      setInspectionId(null);
+      if (reservedInspectionId) {
+        await supabase.rpc('fail_inspection', {
+          p_inspection_id: reservedInspectionId,
+          p_reason:
+            reason instanceof Error ? reason.message : 'Inspection failed',
+        });
+      }
+      if (storagePath)
+        await supabase.storage.from('source-photos').remove([storagePath]);
+      const message =
         reason instanceof Error
           ? reason.message
-          : 'This file could not be inspected.',
+          : 'This file could not be inspected.';
+      setError(
+        message.includes('DAILY_LIMIT_REACHED')
+          ? `You have used today’s ${plans[profile.plan].uploads} inspection limit. Compare plans for more daily uploads.`
+          : message,
       );
     } finally {
       setLoading(false);
@@ -1895,11 +2179,106 @@ function DeepFrameWorkspace() {
       () => setCopiedId((current) => (current === id ? null : current)),
       1600,
     );
+    if (inspectionId) {
+      await supabase.rpc('log_activity', {
+        p_event_type: 'report_shared',
+        p_inspection_id: inspectionId,
+        p_event_data: { method: 'clipboard', section: id },
+      });
+    }
+  };
+
+  const logActivity = async (
+    eventType: string,
+    data: Record<string, unknown> = {},
+  ) => {
+    if (!inspectionId) return;
+    await supabase.rpc('log_activity', {
+      p_event_type: eventType,
+      p_inspection_id: inspectionId,
+      p_event_data: data,
+    });
+  };
+
+  const removeMetadata = async () => {
+    if (!user || !profile || !report || !inspectionId) return;
+    if (profile.role !== 'admin' && profile.plan === 'free') {
+      await logActivity('upgrade_viewed', { source: 'metadata_cleaner' });
+      window.location.assign('/profile#plans');
+      return;
+    }
+    setRemoveBusy(true);
+    setError(null);
+    try {
+      const { error: quotaError } = await supabase.rpc(
+        'consume_metadata_removal',
+        {
+          p_inspection_id: inspectionId,
+        },
+      );
+      if (quotaError) throw quotaError;
+      let input = sourceFile;
+      if (!input && sourcePath) {
+        const { data: signed, error: signedError } = await supabase.storage
+          .from('source-photos')
+          .createSignedUrl(sourcePath, 120);
+        if (signedError || !signed?.signedUrl)
+          throw signedError ?? new Error('Original photo is unavailable.');
+        const response = await fetch(signed.signedUrl);
+        if (!response.ok)
+          throw new Error('Original photo could not be downloaded.');
+        input = new File([await response.blob()], report.file.name, {
+          type: report.file.type,
+        });
+      }
+      if (!input)
+        throw new Error('Original photo is no longer available for cleaning.');
+      const cleaned = await removePrivacyMetadata(input);
+      const safeName = cleaned.fileName
+        .replace(/[^a-zA-Z0-9._-]/g, '_')
+        .slice(-180);
+      const cleanedPath = `${user.id}/${inspectionId}/${Date.now()}-${safeName}`;
+      const { error: uploadError } = await supabase.storage
+        .from('cleaned-photos')
+        .upload(cleanedPath, cleaned.blob, {
+          contentType: cleaned.blob.type,
+          upsert: false,
+        });
+      if (uploadError) throw uploadError;
+      const { error: completionError } = await supabase.rpc(
+        'complete_metadata_removal',
+        {
+          p_inspection_id: inspectionId,
+          p_cleaned_storage_path: cleanedPath,
+        },
+      );
+      if (completionError) throw completionError;
+      download(cleaned.fileName, cleaned.blob, cleaned.blob.type);
+      setError(
+        cleaned.removedKinds.length
+          ? `Clean copy downloaded. Removed: ${cleaned.removedKinds.join(', ')}.`
+          : 'Clean copy downloaded. No removable privacy metadata blocks were present.',
+      );
+    } catch (reason) {
+      const message =
+        reason instanceof Error ? reason.message : 'Metadata removal failed.';
+      setError(
+        message.includes('REMOVAL_LIMIT_REACHED')
+          ? 'You have reached today’s metadata-cleaning limit.'
+          : message,
+      );
+    } finally {
+      setRemoveBusy(false);
+    }
   };
 
   return (
     <>
-      <AppHeader onNew={report ? handleFile : undefined} busy={loading} />
+      <AppHeader
+        onNew={report ? handleFile : undefined}
+        busy={loading}
+        onSignIn={() => setAuthOpen(true)}
+      />
       {report && loading ? (
         <motion.main
           initial={{ opacity: 0 }}
@@ -1920,6 +2299,18 @@ function DeepFrameWorkspace() {
           setGroup={setGroup}
           copiedId={copiedId}
           onCopy={copy}
+          onShare={() =>
+            void logActivity('report_shared', { method: 'share_view' })
+          }
+          onExport={() =>
+            void logActivity('report_exported', { format: 'json' })
+          }
+          onRemoveMetadata={() => void removeMetadata()}
+          removeBusy={removeBusy}
+          canRemoveMetadata={
+            profile?.role === 'admin' || profile?.plan !== 'free'
+          }
+          notice={error}
         />
       ) : (
         <Landing
@@ -1929,6 +2320,21 @@ function DeepFrameWorkspace() {
           fileName={loadingFileName}
         />
       )}
+      <AnimatePresence>
+        {authOpen ? (
+          <motion.div
+            className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-[#020308]/82 p-4 backdrop-blur-xl"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setAuthOpen(false);
+            }}
+          >
+            <AuthPanel onClose={() => setAuthOpen(false)} />
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </>
   );
 }
@@ -1936,6 +2342,8 @@ function DeepFrameWorkspace() {
 type TermsState = 'checking' | 'pending' | 'accepted' | 'declined';
 
 export default function DeepFrame() {
+  const supabase = createClient();
+  const { user, profile, refreshProfile } = useAuth();
   const [introComplete, setIntroComplete] = useState(false);
   const [termsState, setTermsState] = useState<TermsState>('checking');
 
@@ -1948,9 +2356,34 @@ export default function DeepFrame() {
     setTermsState(accepted ? 'accepted' : 'pending');
   }, []);
 
-  const acceptTerms = () => {
+  useEffect(() => {
+    if (
+      termsState !== 'accepted' ||
+      !user ||
+      !profile ||
+      (profile.terms_version === termsVersion &&
+        profile.privacy_version === privacyVersion)
+    ) {
+      return;
+    }
+    void supabase
+      .rpc('accept_legal', {
+        p_terms_version: termsVersion,
+        p_privacy_version: privacyVersion,
+      })
+      .then(() => refreshProfile());
+  }, [profile, refreshProfile, supabase, termsState, user]);
+
+  const acceptTerms = async () => {
     window.localStorage.setItem(termsStorageKey, termsVersion);
     setTermsState('accepted');
+    if (user) {
+      await supabase.rpc('accept_legal', {
+        p_terms_version: termsVersion,
+        p_privacy_version: privacyVersion,
+      });
+      await refreshProfile();
+    }
   };
 
   const declineTerms = () => {
@@ -1972,7 +2405,7 @@ export default function DeepFrame() {
       ) : (
         <TermsGate
           declined={termsState === 'declined'}
-          onAccept={acceptTerms}
+          onAccept={() => void acceptTerms()}
           onDecline={declineTerms}
           onReview={() => setTermsState('pending')}
         />

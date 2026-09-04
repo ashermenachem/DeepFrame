@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
+import { AuthProvider } from '@/components/auth-provider';
 import './globals.css';
 
 const siteOrigin = 'https://deepframesearch.vercel.app';
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteOrigin),
   title: 'DeepFrame by Asher Menachem',
   description:
-    'DeepFrame reveals complete photo metadata privately in your browser—every field, with zero uploads.',
+    'DeepFrame reveals complete photo metadata, saves your private inspection history, and helps remove sensitive metadata.',
   applicationName: 'DeepFrame',
   manifest: '/manifest.webmanifest',
   icons: {
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'DeepFrame',
     description:
-      'DeepFrame is a private photo metadata inspector by Asher Menachem. Every field. Zero uploads.',
+      'DeepFrame is a private photo metadata inspector with secure accounts, saved history, and privacy tools.',
     url: '/',
     siteName: 'DeepFrame',
     type: 'website',
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
         url: '/brand/deepframe-social.png',
         width: 1200,
         height: 630,
-        alt: 'DeepFrame — Every field. Zero uploads. By Asher Menachem.',
+        alt: 'DeepFrame — Every field, clearly explained. By Asher Menachem.',
       },
     ],
   },
@@ -45,7 +46,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'DeepFrame',
     description:
-      'DeepFrame is a private photo metadata inspector by Asher Menachem. Every field. Zero uploads.',
+      'DeepFrame is a private photo metadata inspector with saved history and privacy tools.',
     images: ['/brand/deepframe-social.png'],
   },
 };
@@ -62,7 +63,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${jetBrainsMono.variable}`}>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

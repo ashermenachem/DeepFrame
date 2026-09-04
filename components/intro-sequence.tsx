@@ -259,7 +259,7 @@ export function IntroSequence({ onComplete }: { onComplete?: () => void }) {
               className="mt-5 flex items-center gap-2 font-mono text-[8px] uppercase tracking-[0.18em] text-white/26"
             >
               <ShieldCheck className="size-3.5 text-emerald-200/65" />
-              Every field · Zero uploads
+              Every field · Private history
             </motion.div>
             <motion.div variants={reveal} className="mt-9 flex justify-center">
               <SocialLinks />

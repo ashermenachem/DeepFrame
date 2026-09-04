@@ -263,7 +263,7 @@ export function AnalysisLoader({ fileName }: AnalysisLoaderProps) {
               className="h-4 w-4 text-emerald-300/80"
               strokeWidth={1.7}
             />
-            Your image never leaves this device.
+            Analyzed locally, then saved to your private vault.
           </span>
           <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/30">
             Private by design

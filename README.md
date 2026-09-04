@@ -5,7 +5,7 @@
   <br />
 
   <a href="https://deepframesearch.vercel.app">
-    <img src="./public/brand/deepframe-social.png" alt="DeepFrame — Every field. Zero uploads." width="100%" />
+    <img src="./public/brand/deepframe-social.png" alt="DeepFrame — private photo intelligence." width="100%" />
   </a>
 
   <br />
@@ -14,8 +14,8 @@
   <a href="https://deepframesearch.vercel.app">
     <img src="https://img.shields.io/badge/OPEN_DEEPFRAME-00E5FF?style=for-the-badge&logo=vercel&logoColor=05060A" alt="Open DeepFrame" />
   </a>
-  <img src="https://img.shields.io/badge/PRIVACY-100%25_LOCAL-7C3AED?style=for-the-badge&logo=shield&logoColor=white" alt="100% local processing" />
-  <img src="https://img.shields.io/badge/UPLOADS-ZERO-111827?style=for-the-badge&logo=icloud&logoColor=white" alt="Zero uploads" />
+  <img src="https://img.shields.io/badge/PRIVACY-PRIVATE_BY_DEFAULT-7C3AED?style=for-the-badge&logo=shield&logoColor=white" alt="Private by default" />
+  <img src="https://img.shields.io/badge/ACCOUNTS-SUPABASE-111827?style=for-the-badge&logo=supabase&logoColor=3ECF8E" alt="Supabase accounts" />
   <a href="./LICENSE"><img src="https://img.shields.io/badge/LICENSE-PERMISSION_REQUIRED-F59E0B?style=for-the-badge&logo=readthedocs&logoColor=111827" alt="Source-available license — permission required" /></a>
 
   <h3>See what your photo knows.</h3>
@@ -23,7 +23,7 @@
   <p>
     DeepFrame turns the metadata hidden inside an image into a clear, searchable report—camera,
     lens, location, capture settings, editing history, file structure, cryptographic hashes,
-    raw tags, and more. Everything runs inside your browser.
+    raw tags, and more. Analysis runs in your browser; private history follows your account.
   </p>
 
   <p>
@@ -62,20 +62,18 @@ Metadata tools often dump hundreds of cryptic tags and leave the interpretation 
 - GPS hidden from shared reports by default
 - Responsive, animated interface with reduced-motion support
 
-## Privacy by architecture
+## Privacy and account architecture
 
-Your photo never needs to leave your device.
+DeepFrame analyzes image bytes in the browser, then stores the original and generated report in a private, user-scoped Supabase vault. Row-level security prevents one user from reading another user’s profile, history, or files.
 
 ```mermaid
 flowchart LR
-    A[Your photo] --> B[Browser memory]
-    B --> C[Metadata decoder]
-    B --> D[File structure parser]
-    B --> E[Web Crypto hashes]
-    C --> F[Readable report]
-    D --> F
-    E --> F
-    F --> G[Copy or export]
+    A[Signed-in user] --> B[Browser analysis]
+    B --> C[Readable report]
+    B --> D[Private source vault]
+    C --> E[Private account history]
+    E --> F[Cross-device access]
+    E --> G[Share or export]
 
     style A fill:#111827,stroke:#22d3ee,color:#fff
     style B fill:#0f172a,stroke:#8b5cf6,color:#fff
@@ -83,17 +81,32 @@ flowchart LR
     style G fill:#0f172a,stroke:#8b5cf6,color:#fff
 ```
 
-- No photo upload endpoint
-- No account required
-- No cloud copy of your image
-- No server-side photo processing
-- Analysis disappears when the browser session ends
+- Passwordless email authentication, with Google and GitHub adapters ready for provider credentials
+- Private source and cleaned-photo buckets with user-scoped storage policies
+- Row-level security on every account table
+- Server-enforced daily quotas and role-based administration
+- Material security and product events only—no keystroke or mouse-movement recording
+- Account history controls plus a separate permanent-deletion request flow
 
 ## Responsible use
 
 DeepFrame can surface exact locations and other sensitive details. It is built for legitimate inspection—not stalking, doxxing, covert tracking, harassment, or unauthorized surveillance.
 
-The inspection workspace requires explicit acceptance of the [DeepFrame Terms of Service](https://deepframesearch.vercel.app/terms). Declining keeps the tool locked. Read the repository copy in [TERMS.md](./TERMS.md).
+The inspection workspace requires explicit acceptance of the [DeepFrame Terms of Service](https://deepframesearch.vercel.app/terms) and [Privacy Policy](https://deepframesearch.vercel.app/privacy). Declining keeps the tool locked. Repository copies live in [TERMS.md](./TERMS.md) and [PRIVACY.md](./PRIVACY.md).
+
+## Accounts and plans
+
+| Plan | Inspections | Metadata cleaning | Availability |
+| --- | ---: | ---: | --- |
+| Free | 1/day | — | Available now |
+| DeepFrame Pro | 25/day | 10/day | Checkout coming soon |
+| DeepFrame Studio | 250/day | 100/day | Checkout coming soon |
+
+Unused daily access does not roll over. Administrators are outside plan limits, and every administrative account change is recorded in an audit log.
+
+## Metadata cleaner
+
+The cleaner removes privacy-bearing metadata blocks from JPEG, PNG, and WebP files without recompressing the encoded image pixels. Color data and image streams are preserved; users should still verify the output before publishing it.
 
 ## Supported image families
 
@@ -109,6 +122,7 @@ Browser support for previewing a format can vary, but DeepFrame can still inspec
 
 - Node.js 22
 - npm
+- A Supabase project and publishable key
 
 ### Start developing
 
@@ -120,6 +134,8 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+Create `.env.development.local` with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Apply the versioned migrations in `supabase/migrations/` before using account features.
 
 ### Quality checks
 
@@ -137,7 +153,7 @@ npm run build
 | Next.js 16 | ExifReader | TypeScript 5.9 |
 | React 19 | Web Crypto API | Tailwind CSS 4 |
 | Motion | Browser File APIs | oxlint + oxfmt |
-| Lucide icons | Custom container parsing | GitHub → Vercel |
+| Supabase Auth | Private Storage + RLS | GitHub → Vercel |
 
 </div>
 
@@ -147,15 +163,24 @@ npm run build
 app/
 ├── layout.tsx                 # Metadata, fonts, and global shell
 ├── page.tsx                   # DeepFrame entry point
+├── login/                     # Passwordless account entry
+├── profile/                   # Private history and account controls
+├── admin/                     # Audited administrative console
+├── privacy/                   # Privacy disclosure
 └── globals.css                # Visual system and motion
 components/
 ├── photo-data-finder.tsx      # Main product experience
 ├── deepframe-visual.tsx       # Interactive hero visual
 ├── intro-sequence.tsx         # Opening animation
-└── analysis-loader.tsx        # Analysis state
+├── auth-provider.tsx          # Supabase session state
+└── profile-dashboard.tsx      # Account history and plans
 lib/
 ├── photo-inspector.ts         # Metadata, hashes, types, and structure
-└── share-report.ts            # Human-readable sharing output
+├── metadata-remover.ts        # Lossless container metadata cleaner
+├── legal.ts                   # Versioned legal disclosures
+└── supabase/                  # Browser, server, and proxy clients
+supabase/
+└── migrations/                # Database, RLS, quotas, storage, and audit rules
 public/
 ├── brand/                     # Mark, lockup, and social artwork
 ├── favicon.svg                # Browser tab icon
@@ -199,7 +224,7 @@ Built by **Asher Menachem**.
 ---
 
 <div align="center">
-  <strong>Every field. Zero uploads.</strong>
+  <strong>Every field. Private history.</strong>
   <br />
   <sub>If DeepFrame helps you understand a file, consider starring the repository.</sub>
 </div>

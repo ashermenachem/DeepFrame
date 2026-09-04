@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: 'DeepFrame by Asher Menachem',
     short_name: 'DeepFrame',
     description:
-      'Reveal complete photo metadata privately in your browser—every field, with zero uploads.',
+      'Reveal complete photo metadata with private accounts, saved history, and privacy tools.',
     start_url: '/',
     display: 'standalone',
     background_color: '#05060a',

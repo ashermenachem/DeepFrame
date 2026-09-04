@@ -1,105 +1,99 @@
 # DeepFrame Terms of Service
 
-**Effective date: September 3, 2026**  
-**Terms version: 1.0**
+**Effective date:** September 4, 2026
+**Terms version:** 2.0
 
-These Terms of Service govern access to and use of DeepFrame, including the
-hosted website and its photo-metadata inspection features. By selecting
-**Accept & continue**, accessing the inspection workspace, or using DeepFrame,
-you agree to these terms. If you do not agree, do not use the tool.
+These terms govern DeepFrame's hosted website, accounts, photo inspection,
+saved history, and privacy tools. By choosing **Accept & continue** or using the
+inspection workspace, you accept these terms and the [Privacy Policy](./PRIVACY.md).
 
 ## 1. What DeepFrame does
 
-DeepFrame reads metadata and structural information already contained in an
-image file and presents available results in a more understandable form. The
-hosted version is designed to process selected photos locally in the browser.
+DeepFrame reads metadata and structural information in image files, organizes
+the results, saves account history, and offers privacy tools for supported
+formats. Results can be incomplete, incorrectly encoded, edited, or forged.
 
-DeepFrame cannot recover metadata that was removed before the file reached the
-tool. Results may be incomplete, unsupported, incorrectly encoded, or affected
-by the browser, image format, device, or software that created the file.
+## 2. Accounts and eligibility
 
-## 2. Permission to inspect a file
+Public pages can be viewed without an account, but an account is required to
+inspect or clean a photo. DeepFrame uses passwordless email links and supported
+identity providers; the DeepFrame application does not receive or store your
+provider password. Accounts may be suspended for abuse, security risks, quota
+evasion, unlawful activity, or material violations of these terms.
 
-You may use DeepFrame only with files you own or are authorized to inspect. You
-are responsible for respecting privacy, consent, intellectual-property rights,
+## 3. Permission to inspect
+
+Use DeepFrame only with files you own or are authorized to inspect. You are
+responsible for privacy, consent, intellectual-property rights,
 confidentiality duties, platform rules, and applicable law.
 
-## 3. Prohibited conduct
+## 4. Prohibited conduct
 
-You must not use DeepFrame or information obtained through DeepFrame to:
+Do not use DeepFrame or its results to stalk, harass, threaten, dox, blackmail,
+discriminate, impersonate, secretly track, locate, surveil, profile, or endanger
+anyone; bypass privacy or access controls; facilitate abuse, fraud, violence,
+or unlawful activity; or help another person do any of those things.
 
-- stalk, harass, threaten, intimidate, or abuse another person;
-- secretly track, locate, monitor, surveil, or profile a person;
-- expose or publish a home address, exact location, identity, device identifier,
-  or other sensitive information without appropriate consent;
-- dox, blackmail, discriminate against, impersonate, or endanger anyone;
-- investigate a person or their property without lawful authority;
-- bypass security, privacy protections, access controls, or legal restrictions;
-- facilitate violence, exploitation, fraud, or any unlawful activity; or
-- encourage, assist, or enable another person to do any of the above.
+## 5. Saved uploads, reports, and activity
 
-If a result could affect another person's safety or privacy, stop and obtain
-their informed consent before saving, sharing, publishing, or acting on it.
+For signed-in inspections, DeepFrame stores the uploaded original, generated
+report, usage, and material actions such as inspections, exports, sharing,
+metadata removal, account changes, and deletion requests. These support
+cross-device history, quotas, abuse prevention, and security review.
+Administrators do not routinely inspect individual accounts, but may review
+records for a reported or detected security, safety, abuse, support, or legal
+concern. Administrative changes are logged.
 
-## 4. Responsible sharing
+## 6. Plans and limits
 
-Photo metadata can reveal precise locations, dates, device details, names, and
-workflows. Review every export before sharing it. DeepFrame hides GPS
-coordinates from its simplified share report by default, but you remain
-responsible for any information you choose to reveal or distribute.
+Free accounts receive one inspection per calendar day with no rollover. Paid
+checkout is not yet available, so new users remain on Free unless an
+administrator grants a plan for testing or support. Plan features and prices
+may change before checkout launches. Attempts to evade quotas are prohibited.
 
-## 5. Privacy and local processing
+## 7. Metadata removal
 
-The hosted DeepFrame application is designed to analyze selected image bytes in
-your browser without uploading the original image to a DeepFrame image server.
-Your browser, device, network, hosting provider, extensions, or third-party links
-may operate under their own policies. Do not select a file if you are not
-comfortable processing it on your current device.
+The cleaner removes supported privacy metadata without intentionally changing
+encoded image pixels. Format limitations, color profiles, or
+application-specific blocks may affect what can be removed. Verify the result
+before publishing it.
 
-## 6. No professional advice or guaranteed evidence
+## 8. Responsible sharing
 
-DeepFrame provides informational output, not legal, investigative, forensic,
-safety, or professional advice. Metadata can be missing, edited, forged,
-misinterpreted, or inconsistent. Do not treat a result as definitive proof of
-identity, ownership, location, time, intent, authenticity, or wrongdoing.
+Metadata can reveal locations, dates, device details, names, and workflows.
+Review every export before sharing it. You remain responsible for information
+you reveal or distribute.
 
-Verify important conclusions independently with qualified professionals and
-lawful methods.
+## 9. Privacy rights and deletion
 
-## 7. Ownership and software license
+Hiding a history item archives it from the normal account view; it is not
+permanent deletion. A separate account-data deletion request is available.
+Narrowly limited records may be retained when reasonably necessary for
+security, fraud prevention, disputes, or legal obligations, as described in the
+Privacy Policy.
+
+## 10. Ownership and license
 
 DeepFrame, its design, branding, source code, and original materials belong to
-Asher Menachem unless otherwise stated. Access to the hosted tool does not grant
-permission to copy or reuse its source code. Source-code use is governed by the
-[DeepFrame Source-Available License](./LICENSE).
+Asher Menachem unless otherwise stated. Access does not grant permission to
+copy, modify, redistribute, bypass usage controls, or commercially exploit the
+code. See [LICENSE](./LICENSE).
 
-## 8. Availability and changes
+## 11. Accuracy and availability
 
-DeepFrame may change, suspend, restrict, or discontinue features at any time.
-These terms may also be updated. When a material update requires renewed
-acceptance, the application may ask you to accept the new version before using
-the inspection workspace.
+DeepFrame provides informational output, not legal, investigative, forensic,
+safety, or professional advice. Do not treat results as definitive proof of
+identity, ownership, location, time, intent, authenticity, or wrongdoing.
 
-## 9. Disclaimer
+## 12. Disclaimer and limitation
 
-DEEPFRAME IS PROVIDED "AS IS" AND "AS AVAILABLE." TO THE MAXIMUM EXTENT
-PERMITTED BY LAW, NO EXPRESS OR IMPLIED WARRANTIES ARE MADE REGARDING
-AVAILABILITY, SECURITY, ACCURACY, COMPLETENESS, FITNESS FOR A PARTICULAR
-PURPOSE, TITLE, OR NON-INFRINGEMENT.
+DeepFrame is provided "as is" and "as available," without warranties of
+availability, security, accuracy, completeness, fitness for a particular
+purpose, title, or non-infringement. To the maximum extent permitted by law,
+Asher Menachem is not liable for indirect, incidental, special, consequential,
+exemplary, or punitive damages, or loss of data, privacy, profits, revenue, or
+goodwill arising from DeepFrame, its results, or their use.
 
-## 10. Limitation of liability
-
-TO THE MAXIMUM EXTENT PERMITTED BY LAW, ASHER MENACHEM WILL NOT BE LIABLE FOR
-INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES,
-OR FOR LOSS OF DATA, PRIVACY, PROFITS, REVENUE, OR GOODWILL, ARISING FROM OR
-RELATED TO DEEPFRAME, ITS RESULTS, OR THEIR USE.
-
-## 11. Violations and contact
-
-Access may be restricted or terminated when these terms are violated. Questions,
-permission requests, and responsible-use concerns may be directed to Asher
-Menachem through the public contact methods at
-[github.com/ashermenachem](https://github.com/ashermenachem).
-
-If you believe someone is in immediate danger, contact the appropriate local
-emergency service. DeepFrame is not an emergency-reporting system.
+Questions, permission requests, and responsible-use concerns may be directed to
+Asher Menachem through the official DeepFrame repository or creator channels.
+This document should be reviewed by qualified counsel before commercial launch.

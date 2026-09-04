@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   ArrowRight,
   Ban,
-  GitBranch,
   LockKeyhole,
   RotateCcw,
   ShieldAlert,
@@ -14,7 +13,12 @@ import { motion, useReducedMotion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { LegalTerms } from '@/components/legal-terms';
 import { DeepFrameMark } from '@/components/deepframe-logo';
-import { prohibitedUses, termsEffectiveDate, termsVersion } from '@/lib/legal';
+import {
+  privacyVersion,
+  prohibitedUses,
+  termsEffectiveDate,
+  termsVersion,
+} from '@/lib/legal';
 
 type TermsGateProps = {
   declined: boolean;
@@ -206,9 +210,10 @@ export function TermsGate({
                 <strong className="font-semibold text-white/82">
                   Accept & continue
                 </strong>
-                , you confirm that you are authorized to inspect your files and
-                agree not to use DeepFrame or its results to harm, track,
-                expose, or invade the privacy of another person.
+                , you confirm that you are authorized to inspect your files,
+                agree to the Terms and Privacy Policy, understand that signed-in
+                uploads, reports, usage, and material security actions are saved,
+                and agree not to use DeepFrame to harm or secretly track anyone.
               </p>
             </div>
           </div>
@@ -223,14 +228,13 @@ export function TermsGate({
             >
               Decline
             </button>
-            <a
-              href="https://github.com/ashermenachem/DeepFrame"
+            <Link
+              href="/privacy"
               target="_blank"
-              rel="noreferrer"
               className="inline-flex items-center gap-1.5 text-[10px] text-white/28 transition hover:text-white/65"
             >
-              <GitBranch className="size-3.5" /> View source
-            </a>
+              <LockKeyhole className="size-3.5" /> Privacy v{privacyVersion}
+            </Link>
           </div>
           <Button
             ref={primaryActionRef}
