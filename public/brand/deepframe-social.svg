@@ -32,7 +32,7 @@
     <path d="m22.3 20.2 18.2 9.9v12.1l-18.2 7.5" stroke="white" stroke-opacity=".54" stroke-width=".65" stroke-linejoin="round"/>
   </g>
   <text x="76" y="294" fill="url(#word)" font-family="Inter, Arial, sans-serif" font-size="112" font-weight="650" letter-spacing="-7">DeepFrame</text>
-  <text x="82" y="365" fill="#C6F7FF" fill-opacity=".74" font-family="JetBrains Mono, monospace" font-size="24" letter-spacing="2">EVERY FIELD. ZERO UPLOADS.</text>
+  <text x="82" y="365" fill="#C6F7FF" fill-opacity=".74" font-family="JetBrains Mono, monospace" font-size="24" letter-spacing="2">EVERY FIELD. PRIVATE HISTORY.</text>
   <path d="M82 419H615" stroke="url(#word)" stroke-opacity=".42"/>
   <text x="82" y="473" fill="white" fill-opacity=".5" font-family="Inter, Arial, sans-serif" font-size="26">Private photo intelligence by Asher Menachem</text>
   <rect x="38.5" y="38.5" width="1123" height="553" rx="27.5" stroke="white" stroke-opacity=".07"/>
