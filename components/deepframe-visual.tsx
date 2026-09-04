@@ -15,6 +15,7 @@ import {
   ScanLine,
   ShieldCheck,
 } from 'lucide-react';
+import { DeepFrameMark } from '@/components/deepframe-logo';
 
 const spring = { stiffness: 120, damping: 22, mass: 0.7 };
 
@@ -142,7 +143,7 @@ export function DeepFrameVisual({ className = '' }: { className?: string }) {
           <div className="relative flex h-full flex-col overflow-hidden rounded-[1.55rem] border border-white/[0.08] bg-gradient-to-b from-white/[0.06] to-white/[0.015] sm:rounded-[2rem]">
             <div className="flex h-11 shrink-0 items-center justify-between border-b border-white/[0.07] px-4 sm:h-13 sm:px-5">
               <div className="flex items-center gap-2">
-                <span className="size-1.5 rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(103,232,249,.9)]" />
+                <DeepFrameMark className="size-3.5" />
                 <span className="font-mono text-[7px] font-medium uppercase tracking-[0.2em] text-white/55 sm:text-[8px]">
                   DeepFrame / Live analysis
                 </span>

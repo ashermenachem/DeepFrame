@@ -49,7 +49,6 @@ import {
   Maximize2,
   Radio,
   Scale,
-  ScanSearch,
   Search,
   Share2,
   ShieldCheck,
@@ -66,6 +65,7 @@ import { IntroSequence, SocialLinks } from '@/components/intro-sequence';
 import { AnalysisLoader } from '@/components/analysis-loader';
 import { DeepFrameVisual } from '@/components/deepframe-visual';
 import { TermsGate } from '@/components/terms-gate';
+import { DeepFrameLogo } from '@/components/deepframe-logo';
 import {
   findField,
   formatBytes,
@@ -317,19 +317,12 @@ function AppHeader({
   return (
     <header className="sticky top-0 z-40 px-3 pt-3 sm:px-5">
       <div className="glass-nav mx-auto flex h-14 max-w-[1480px] items-center justify-between rounded-2xl px-3 sm:px-4">
-        <a href="#top" className="group flex min-w-0 items-center gap-2.5">
-          <div className="relative grid size-8 place-items-center overflow-hidden rounded-[10px] border border-cyan-200/20 bg-gradient-to-br from-cyan-200/15 to-violet-300/10 shadow-[0_8px_26px_rgba(73,205,219,.12)]">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-            <ScanSearch className="relative size-4 text-cyan-100" />
-          </div>
-          <div className="min-w-0">
-            <p className="truncate text-[13px] font-semibold tracking-[-0.025em] text-white/95">
-              DeepFrame
-            </p>
-            <p className="font-mono text-[7px] uppercase tracking-[0.18em] text-white/32">
-              by Asher Menachem
-            </p>
-          </div>
+        <a href="#top" className="group flex min-w-0 items-center">
+          <DeepFrameLogo
+            creator
+            markClassName="size-8 transition-transform duration-500 group-hover:-rotate-3 group-hover:scale-105"
+            wordmarkClassName="text-[13px]"
+          />
         </a>
         {!onNew && (
           <nav
@@ -947,12 +940,11 @@ function Landing({
       <footer className="border-t border-white/[0.07] px-5 py-7">
         <div className="mx-auto flex max-w-[1380px] flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs font-semibold tracking-[-0.02em] text-white/65">
-              DeepFrame{' '}
-              <span className="font-normal text-white/25">
-                by Asher Menachem
-              </span>
-            </p>
+            <DeepFrameLogo
+              creator
+              markClassName="size-9"
+              wordmarkClassName="text-sm"
+            />
             <p className="mt-1 font-mono text-[7px] uppercase tracking-[0.16em] text-white/22">
               Every field · Zero uploads
             </p>

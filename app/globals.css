@@ -177,6 +177,48 @@ body::before {
   -webkit-background-clip: text;
 }
 
+.brand-wordmark {
+  color: rgba(255, 255, 255, 0.97);
+}
+
+.brand-wordmark > span {
+  color: transparent;
+  background-image: linear-gradient(105deg, #effeff 4%, #9deeff 58%, #b4a4ff);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+.brand-mark-shell {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  filter: drop-shadow(0 9px 15px rgba(77, 199, 238, 0.13));
+}
+
+.brand-mark-shell::after {
+  position: absolute;
+  z-index: -1;
+  inset: 18%;
+  content: '';
+  border-radius: 45%;
+  background: linear-gradient(
+    135deg,
+    rgba(78, 221, 244, 0.28),
+    rgba(130, 91, 255, 0.3)
+  );
+  filter: blur(10px);
+  opacity: 0.55;
+  transition: opacity 300ms ease;
+}
+
+a:hover .brand-mark-shell::after {
+  opacity: 0.95;
+}
+
+.brand-intro-fold {
+  animation: brand-breathe 3.8s ease-in-out infinite;
+}
+
 .accent-text {
   color: transparent;
   background-image: linear-gradient(100deg, #80f0de, #80cfff 48%, #ba9cff);
@@ -390,6 +432,20 @@ body::before {
 @keyframes gradient-drift {
   to {
     background-position: 100% 50%;
+  }
+}
+
+@keyframes brand-breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 20px 70px rgba(66, 214, 222, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.13);
+  }
+  50% {
+    box-shadow:
+      0 24px 86px rgba(122, 103, 255, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 }
 

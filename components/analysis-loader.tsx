@@ -3,13 +3,13 @@
 import type { LucideIcon } from 'lucide-react';
 import {
   Binary,
-  FileImage,
   Fingerprint,
   Layers3,
   ScanLine,
   ShieldCheck,
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
+import { DeepFrameMark } from '@/components/deepframe-logo';
 
 type AnalysisLoaderProps = {
   fileName?: string;
@@ -173,10 +173,7 @@ export function AnalysisLoader({ fileName }: AnalysisLoaderProps) {
               style={{ transformPerspective: 700 }}
             >
               <div className="flex h-full flex-col justify-between">
-                <FileImage
-                  className="h-7 w-7 text-cyan-100/90"
-                  strokeWidth={1.35}
-                />
+                <DeepFrameMark className="h-8 w-8" />
                 <div className="space-y-2">
                   <div className="h-px w-full bg-white/20" />
                   <div className="h-px w-4/5 bg-white/15" />

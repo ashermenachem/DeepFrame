@@ -19,7 +19,12 @@ export const metadata: Metadata = {
   title: 'DeepFrame by Asher Menachem',
   description:
     'DeepFrame reveals complete photo metadata privately in your browser—every field, with zero uploads.',
-  icons: { icon: '/favicon.svg' },
+  applicationName: 'DeepFrame',
+  manifest: '/manifest.webmanifest',
+  icons: {
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    apple: '/apple-touch-icon.png',
+  },
   openGraph: {
     title: 'DeepFrame',
     description:
@@ -29,9 +34,9 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/og-v2.png',
-        width: 1734,
-        height: 907,
+        url: '/brand/deepframe-social.png',
+        width: 1200,
+        height: 630,
         alt: 'DeepFrame — Every field. Zero uploads. By Asher Menachem.',
       },
     ],
@@ -41,7 +46,7 @@ export const metadata: Metadata = {
     title: 'DeepFrame',
     description:
       'DeepFrame is a private photo metadata inspector by Asher Menachem. Every field. Zero uploads.',
-    images: ['/og-v2.png'],
+    images: ['/brand/deepframe-social.png'],
   },
 };
 

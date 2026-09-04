@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, GitBranch, Scale, ShieldCheck } from 'lucide-react';
 import { LegalTerms } from '@/components/legal-terms';
+import { DeepFrameLogo } from '@/components/deepframe-logo';
 import { termsEffectiveDate, termsVersion } from '@/lib/legal';
 
 export const metadata: Metadata = {
@@ -35,6 +36,12 @@ export default function TermsPage() {
           </div>
           <div className="mt-10 inline-flex items-center gap-2 rounded-full border border-violet-100/12 bg-violet-100/[0.045] px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.18em] text-violet-100/65">
             <Scale className="size-3" /> Terms of Service
+          </div>
+          <div className="mt-8">
+            <DeepFrameLogo
+              markClassName="size-11"
+              wordmarkClassName="text-xl sm:text-2xl"
+            />
           </div>
           <h1 className="gradient-text mt-5 text-4xl font-semibold tracking-[-0.06em] sm:text-7xl">
             Use insight responsibly.

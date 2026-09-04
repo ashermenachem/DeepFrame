@@ -1,6 +1,11 @@
 <div align="center">
+  <img src="./public/brand/deepframe-lockup.svg" alt="DeepFrame" width="430" />
+
+  <br />
+  <br />
+
   <a href="https://deepframesearch.vercel.app">
-    <img src="./public/og-v2.png" alt="DeepFrame — Every field. Zero uploads." width="100%" />
+    <img src="./public/brand/deepframe-social.png" alt="DeepFrame — Every field. Zero uploads." width="100%" />
   </a>
 
   <br />
@@ -152,8 +157,9 @@ lib/
 ├── photo-inspector.ts         # Metadata, hashes, types, and structure
 └── share-report.ts            # Human-readable sharing output
 public/
-├── og-v2.png                  # Social and repository artwork
-└── favicon.svg                # DeepFrame mark
+├── brand/                     # Mark, lockup, and social artwork
+├── favicon.svg                # Browser tab icon
+└── icon-*.png                 # Installable app icons
 ```
 
 ## Deployment

@@ -1,13 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Aperture, ShieldCheck, X } from 'lucide-react';
+import { ShieldCheck, X } from 'lucide-react';
 import {
   AnimatePresence,
   motion,
   stagger,
   useReducedMotion,
 } from 'motion/react';
+import { DeepFrameMark } from '@/components/deepframe-logo';
 
 const introKey = 'deepframe-intro-seen-v2';
 
@@ -180,11 +181,11 @@ export function IntroSequence({ onComplete }: { onComplete?: () => void }) {
           >
             <motion.div
               variants={reveal}
-              className="perspective-stage relative mb-8 grid size-24 place-items-center sm:mb-10 sm:size-28"
+              className="perspective-stage relative mb-8 grid size-28 place-items-center sm:mb-10 sm:size-36"
             >
               <motion.span
                 aria-hidden="true"
-                className="absolute inset-0 rounded-full border border-dashed border-cyan-100/22"
+                className="absolute inset-0 rounded-[2.2rem] border border-dashed border-cyan-100/22"
                 initial={
                   reduceMotion
                     ? false
@@ -202,7 +203,7 @@ export function IntroSequence({ onComplete }: { onComplete?: () => void }) {
               />
               <motion.span
                 aria-hidden="true"
-                className="absolute inset-3 rounded-full border border-violet-100/20"
+                className="absolute inset-3 rounded-[1.8rem] border border-violet-100/20"
                 initial={
                   reduceMotion ? false : { scale: 0.7, opacity: 0, rotate: 30 }
                 }
@@ -218,7 +219,7 @@ export function IntroSequence({ onComplete }: { onComplete?: () => void }) {
                 }}
               />
               <motion.div
-                className="grid size-14 place-items-center rounded-[1.15rem] border border-white/15 bg-gradient-to-br from-cyan-200/16 via-white/[0.055] to-violet-300/14 shadow-[0_20px_70px_rgba(66,214,222,.2),inset_0_1px_0_rgba(255,255,255,.13)] backdrop-blur-xl sm:size-16"
+                className="brand-intro-fold grid size-20 place-items-center rounded-[1.45rem] border border-white/15 bg-gradient-to-br from-cyan-200/12 via-white/[0.045] to-violet-300/12 p-3 shadow-[0_20px_70px_rgba(66,214,222,.2),inset_0_1px_0_rgba(255,255,255,.13)] backdrop-blur-xl sm:size-24 sm:p-4"
                 initial={
                   reduceMotion
                     ? false
@@ -231,10 +232,7 @@ export function IntroSequence({ onComplete }: { onComplete?: () => void }) {
                   ease: [0.16, 1, 0.3, 1],
                 }}
               >
-                <Aperture
-                  className="size-6 text-cyan-50 sm:size-7"
-                  strokeWidth={1.25}
-                />
+                <DeepFrameMark className="size-full" />
               </motion.div>
             </motion.div>
 
@@ -246,9 +244,9 @@ export function IntroSequence({ onComplete }: { onComplete?: () => void }) {
             </motion.p>
             <motion.h1
               variants={reveal}
-              className="gradient-text mt-5 text-[clamp(4rem,13vw,10.5rem)] font-semibold leading-[0.78] tracking-[-0.085em]"
+              className="brand-wordmark mt-5 text-[clamp(4rem,13vw,10.5rem)] font-semibold leading-[0.78] tracking-[-0.085em]"
             >
-              DeepFrame
+              Deep<span>Frame</span>
             </motion.h1>
             <motion.p
               variants={reveal}

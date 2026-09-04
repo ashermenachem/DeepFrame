@@ -8,17 +8,13 @@ import {
   GitBranch,
   LockKeyhole,
   RotateCcw,
-  Scale,
   ShieldAlert,
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { LegalTerms } from '@/components/legal-terms';
-import {
-  prohibitedUses,
-  termsEffectiveDate,
-  termsVersion,
-} from '@/lib/legal';
+import { DeepFrameMark } from '@/components/deepframe-logo';
+import { prohibitedUses, termsEffectiveDate, termsVersion } from '@/lib/legal';
 
 type TermsGateProps = {
   declined: boolean;
@@ -149,8 +145,8 @@ export function TermsGate({
                 stalking, harassment, doxxing, or covert surveillance.
               </p>
             </div>
-            <div className="hidden size-12 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/[0.045] sm:grid">
-              <Scale className="size-5 text-violet-100/70" strokeWidth={1.5} />
+            <div className="hidden size-12 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/[0.045] p-2 sm:grid">
+              <DeepFrameMark className="size-full" />
             </div>
           </div>
         </header>
@@ -206,10 +202,13 @@ export function TermsGate({
             <div className="flex gap-3">
               <LockKeyhole className="mt-0.5 size-4 shrink-0 text-emerald-200/70" />
               <p className="text-[11px] leading-5 text-white/48">
-                By choosing <strong className="font-semibold text-white/82">Accept & continue</strong>,
-                you confirm that you are authorized to inspect your files and
-                agree not to use DeepFrame or its results to harm, track, expose,
-                or invade the privacy of another person.
+                By choosing{' '}
+                <strong className="font-semibold text-white/82">
+                  Accept & continue
+                </strong>
+                , you confirm that you are authorized to inspect your files and
+                agree not to use DeepFrame or its results to harm, track,
+                expose, or invade the privacy of another person.
               </p>
             </div>
           </div>
